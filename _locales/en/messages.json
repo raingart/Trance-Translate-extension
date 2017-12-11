@@ -1,0 +1,22 @@
+{
+   "localization": {
+      "description": "Extension's Localization",
+      "message": "en"
+   },
+   "extName": {
+      "description": "Extension's name",
+      "message": "Trance Translate"
+   },
+   "extShortName": {
+      "description": "Extension's short name",
+      "message": "Trance Translate"
+   },
+   "extDescription": {
+      "description": "Extension's description",
+      "message": "Trance - is a new easy minimalist translator for your browser. Simple, open-source, no malware, for personal use"
+   },
+   "extTitle": {
+      "description": "Extension's title",
+      "message": "Translate Selected"
+   }
+}
