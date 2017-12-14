@@ -1,183 +1,180 @@
-
-const App = {
-    debug: false,
-
-    translate: function (ev, callback_v) {
-        var e = ev || {
-            sourceLang: document.getElementById('fromLang').value || 'auto',
-            targetLang: document.getElementById('toLang').value || 'en',
-            sourceText: $("#text-to-translate").val()
-        };
-        var callback = callback_v || App.clearResonse;
-
-        // App.uiIsLoading(false);
-        App.ui.uiIsLoading(true);
-
-        var st = translateAPI.Google(e, callback);
-        if (!st) {
-            App.ui.uiIsLoading(false);
-        }
-    },
-
-    ui: {
-        ui: function (e) {
-            document.getElementById('translatedText').value = e.translatedText;
-            App.ui.selectedOptionByVal(document.getElementById("fromLang"), e.detectLang);
-        },
-
-        uiIsLoading: function (status) {
-            if (status) {
-                var i = 0,
-                    text = "loading";
-                // var loadingSymbol = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
-                App.loadingMessage = setInterval(function () {
-                    // i = i < loadingSymbol.length - 1 ? ++i : 0;
-                    $("#translatedText").val(
-                        text + Array((++i % 4) + 1).join(".")
-                        // loadingSymbol[i]
-                    );
-                }, 500);
-                setTimeout(function () { document.getElementById("translate").disabled = false; }, 1000);
-            }
-            else {
-                clearInterval(App.loadingMessage);
-            }
-        },
-
-        selectedOptionByVal: function (selectName, optVal) {
-            for (var opt, j = 0; opt = selectName.options[j]; j++) {
-                if (opt.value == optVal) {
-                    selectName.selectedIndex = j;
-                    break;
-                }
-            }
-        },
-
-        ExchangeLanguages: function () {
-            var fromLang = document.getElementById("fromLang"); //.selectedIndex
-            var toLang = document.getElementById("toLang");
-
-            var fromLang_temp = fromLang.value;
-            var toLang_temp = toLang.value;
-
-            App.ui.selectedOptionByVal(toLang, fromLang_temp);
-            App.ui.selectedOptionByVal(fromLang, toLang_temp);
-
-            var s = $('#text-to-translate');
-            var t = $("#translatedText");
-
-            t1_temp = t.val();
-            s1_temp = s.val();
-
-            t.val(s1_temp);
-            s.val(t1_temp);
-        },
-
-        onPageDetailsReceived: function (details) {
-            document.getElementById('text-to-translate').value = details.summary;
-            App.translate();
-        }
-    },
-
-
-    clearResonse: function (res) {
-        App.log('resirve: ' + JSON.stringify(res));
-        var text = {
-            // return {
-            'sourceText': res[0][0][1],
-            'translatedText': res[0][0][0],
-            'detectLang': res[2]
-        };
-        App.ui.ui(text);
-    },
-
-    config: {
-        // Saves options to localStorage/chromeSync.
-        update: function (reset) {
-            if (reset) {
-                localStorage.clear();
-            }
-            var options_Storage = {};
-
-            options_Storage.fromLang = fromLang.value || 'auto';
-            options_Storage.toLang = toLang.value || 'en';
-
-            Storage.setParams(options_Storage, chrome.storage.local);
-        },
-
-        // Restores select box state to saved value from localStorage/chromeSync.
-        load: function (base) {
-            App.log("Load the configuration from localStorage: \n" + JSON.stringify(base));
-
-            for (var property in base) {
-                var item = base[property];
-                App.log("item> " + property + ":" + item);
-                var el = document.getElementById(property);
-
-                if (el) {
-                    App.log("item find tag> " + property + ":" + item);
-                    App.ui.selectedOptionByVal(el, item);
-                    // el.checked = item ? true : false; // Check/Uncheck
-                }
-            }
-        },
-    },
-
-
-    init: function () {
-        App.log('App Init');
-
-        window.onload = Storage.getParams(null, App.config.load, chrome.storage.local);
-
-        var textarea = document.getElementsByTagName("textarea")[0];
-        textarea.focus();
-        textarea.select();
-
-        for (var key in lang) {
-            $("#fromLang, #toLang").append(
-                '<option value="' +
-                key +
-                '">' +
-                lang[key] +
-                "</option>"
-            );
-        }
-    },
-
-    log: function (msg) {
-        if (App.debug) {
-            msg = String(msg) || NULL;
-            console.log('>> ' + msg);
-        }
-    }
-};
-
-
 // When the popup HTML has loaded
-window.addEventListener('load', function (evt) {
+window.onload = () => {
+    // window.addEventListener('load', (evt) => {
 
-    $(document).on('input', 'textarea', function () {
-        $(this).outerHeight(38).outerHeight(this.scrollHeight); // 38 or '1em' -min-height
+    const App = {
+        debug: false,
+        // debug: true,
+
+        translate: (e, source, callback) => {
+            var e = e || {
+                sourceLang: App.ui.getElement.sourceLang.value,
+                targetLang: App.ui.getElement.targetLang.value,
+                sourceText: App.ui.getElement.sourceText.value,
+            };
+            var callback = callback || App.ui.ui;
+            var source = source || 'Google';
+
+            // App.uiIsLoading(false);
+            App.ui.uiIsLoading(true);
+
+            var status = translateAPI[source](e, callback);
+            if (!status) {
+                App.ui.uiIsLoading(false);
+            }
+        },
+
+        ui: {
+            getElement: {
+                sourceLang: document.getElementById('fromLang'),
+                targetLang: document.getElementById('toLang'),
+                // sourceText: document.getElementById('textToTranslate'),
+                sourceText: document.querySelectorAll('textarea')[0],
+                bthTranslate: document.getElementById('translate'),
+                // translatedText: document.getElementById('translatedText'),
+                translatedText: document.querySelectorAll('textarea')[1]
+            },
+
+            ui: (e) => {
+                App.log('resirve: ' + JSON.stringify(e));
+                App.ui.getElement.translatedText.value = e.translatedText;
+                // document.getElementsByTagName("textarea")[1].select();
+                App.ui.selectedOptionByVal(App.ui.getElement.sourceLang, e.detectLang);
+            },
+
+            uiIsLoading: (status) => {
+                if (status) {
+                    var i = 0,
+                        text = "loading" + Array((++i % 4) + 1).join(".");
+                    App.loadingMessage = setInterval(() => {
+                        App.ui.getElement.translatedText.value = text;
+                    }, 500);
+                    setTimeout(() => {
+                        App.ui.getElement.bthTranslate.disabled = false;
+                    }, 1000);
+                } else {
+                    clearInterval(App.loadingMessage);
+                }
+            },
+
+            selectedOptionByVal: (selectName, optVal) => {
+                if (!selectName.options) return false;
+                for (var opt, j = 0; opt = selectName.options[j]; j++) {
+                    if (opt.value == optVal) {
+                        selectName.selectedIndex = j;
+                        break;
+                    }
+                }
+            },
+
+            ExchangeLanguages: () => {
+                var fromLang_temp = App.ui.getElement.sourceLang.value;
+                var toLang_temp = App.ui.getElement.targetLang.value;
+
+                App.ui.selectedOptionByVal(App.ui.getElement.sourceLang, toLang_temp);
+                App.ui.selectedOptionByVal(App.ui.getElement.targetLang, fromLang_temp);
+
+                // var a = App.ui.getElement.sourceText;
+                // var b = App.ui.getElement.translatedText;
+
+                // b.value = [a.value, a.value = b.value][0];
+            },
+
+            autoExpand: (e) => {
+                e.style.height = 'inherit'
+                e.style.height = e.scrollHeight + 'px'
+            },
+
+            onPageDetailsReceived: (details) => {
+                App.ui.getElement.sourceText.value = details.summary;
+                App.translate();
+            },
+        },
+
+        config: {
+            // Saves options to localStorage/chromeSync.
+            update: (reset) => {
+                if (reset)
+                    localStorage.clear();
+
+                options_Storage = {};
+
+                options_Storage.fromLang = App.ui.getElement.sourceLang.value || 'auto';
+                options_Storage.toLang = App.ui.getElement.targetLang.value || 'en';
+                options_Storage.textToTranslate = App.ui.getElement.sourceText.value;
+
+                Storage.setParams(options_Storage, chrome.storage.local);
+            },
+
+            // Restores select box state to saved value from localStorage/chromeSync.
+            load: (base) => {
+                App.log("Load the configuration from localStorage: \n" + JSON.stringify(base));
+
+                for (var property in base) {
+                    var item = base[property];
+                    App.log("item> " + property + ":" + item);
+                    var el = document.getElementById(property);
+
+                    if (el) {
+                        App.log("item find tag> " + property + ":" + item);
+                        App.ui.selectedOptionByVal(el, item);
+                        // el.checked = item ? true : false; // Check/Uncheck
+                    }
+                }
+            },
+        },
+
+        init: () => {
+            App.log('App Init');
+            Storage.getParams(null, App.config.load, chrome.storage.local);
+            // window.onload = Storage.getParams(null, App.config.load, chrome.storage.local);
+            App.ui.getElement.sourceText.focus();
+            
+            for (var i in lang) {
+                App.ui.getElement.sourceLang.options[App.ui.getElement.sourceLang.options.length] = new Option(lang[i], i);
+                App.ui.getElement.targetLang.options[App.ui.getElement.targetLang.options.length] = new Option(lang[i], i);
+            }
+            // var optionsHTML = [];
+            // for (var key in lang) {
+            //     optionsHTML.push( '<option value="' + key + '">' + lang[key] + '</option>' );
+            // }
+            // App.ui.getElement.sourceLang.innerHTML += optionsHTML.join('\n');
+            // App.ui.getElement.targetLang.innerHTML += optionsHTML.join('\n');
+        },
+
+        log: (msg) => {
+            if (App.debug)
+                console.log('>> ' + String(msg))
+        }
+        //   const log = (parameter) => { console.log(parameter);};
+    };
+
+
+    // When the popup HTML has loaded
+    // window.addEventListener('load', (evt) => {
+    App.ui.getElement.sourceText.addEventListener("input", function () {
+        App.ui.autoExpand(this)
     });
 
-    $(document).on('click', '#translatedText', function () {
-        $(this).outerHeight(38).outerHeight(this.scrollHeight); // 38 or '1em' -min-height
+    App.ui.getElement.translatedText.addEventListener("click", function () {
+        App.ui.autoExpand(this)
     });
 
-    document.onkeyup = function (ev) {
-        var e = ev || window.event; // for IE to cover IEs window event-object
+    // document.onkeyup = (e) => {
+    document.addEventListener("keyup", function (e) {
         if (e.ctrlKey && e.which == 13) {
             App.translate();
-            // document.getElementById('text-to-translate').value += '\n';
+            // document.getElementById('textToTranslate').value += '\n';
             // return false;
         } else if (e.shiftKey && e.which == 13) {
             App.ui.ExchangeLanguages();
             return false;
-        } else if (e.which == 13) {
-            App.translate();
-            return false;
+        // } else if (e.which == 13) {
+        //     App.translate();
+        //     return false;
         }
-    };
+    });
+    // };
 
     // buttonSave.addEventListener("click", function (e) {
     //     App.config.update();
@@ -188,23 +185,31 @@ window.addEventListener('load', function (evt) {
     // });
     // document.getElementById("fromTextPlayer").addEventListener("click", function(event) { fromLangListener.play(this); }, false);
 
-    exchangeFromTo.addEventListener("click", function (e) {
+    document.getElementById("textToPlay").addEventListener("click", function (e) {
+        var classes = this.querySelectorAll('i')[0]
+        // this.querySelectorAll('i')[0].classList.toggle("icon-volume-up");
+            classes.classList.toggle("icon-volume-off");
+        if (classes.indexOf("icon-volume-up"))
+            classes.classList.toggle("icon-volume-off");
+    });
+
+    exchangeFromTo.addEventListener("click", (e) => {
         App.ui.ExchangeLanguages();
     });
 
-    translate.addEventListener("click", function (e) {
+    translate.addEventListener("click", (e) => {
         App.translate();
         App.config.update();
     });
 
     // chrome.tabs.getSelected(null, function(tab) {
     //     chrome.tabs.sendRequest(tab.id, {method: 'getSelection'}, function (response) {
-    //     //   document.getElementById('text-to-translate').value = response.data;
+    //     //   document.getElementById('textToTranslate').value = response.data;
     //       console.log(response) ;
     //     });
     //   });
 
-    chrome.runtime.getBackgroundPage(function (eventPage) {
+    chrome.runtime.getBackgroundPage((eventPage) => {
         // Call the getPageInfo function in the event page, passing in 
         // our onPageDetailsReceived function as the callback. This injects 
         // content.js into the current tab's HTML
@@ -212,4 +217,5 @@ window.addEventListener('load', function (evt) {
     });
 
     App.init();
-});
+// });
+};

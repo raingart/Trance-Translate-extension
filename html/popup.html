@@ -3,52 +3,47 @@
 
 <head>
 	<meta charset="utf-8" />
-	<title></title>
+	<title>Trance Translate</title>
 	<link rel="stylesheet" href="/css/skeleton/normalize.min.css">
-
-	<link rel="stylesheet" href="/css/flex.css" />
-	
 	<link rel="stylesheet" href="/css/tooltip/tooltip.min.css" />
 	<link rel="stylesheet" href="/css/tooltip/tooltip-animation.min.css" />
-	
+	<link rel="stylesheet" href="/css/font-awesome.min.css" />
 	<link rel="stylesheet" href="/css/popup.css" />
-	<!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script> -->
-	<script src="/lib/jquery.min.js"></script>
+
 	<script src="/js/translation.js"></script>
-	<script src="/js/lang.js"></script>
+	<script src="/js/lang.min.js"></script>
 	<script src="/js/popup.js"></script>
 </head>
 
 <body>
 
-	<div id="wrapper">
-		<div class="container flex-container flex-direction-column flex-wrap">
-
-			<div class="flex-item">
-				<textarea id="text-to-translate" placeholder="Text to translate"></textarea>
+	<div class="wrapper">
+		<div class="container">
+			
+			<div class="item">
+				<textarea id="textToTranslate" placeholder="__MSG_AreaTranslateIn__"></textarea>
+				<a href="#" id="textToPlay" class="toTextPlayer player_button"><i class="icon-volume-down"></i></a>
 			</div>
 
-			<div class="flex-item">
-				<select id="fromLang">
-					<option selected value="">Auto detect</option>
-					<!-- <option selected disabled value="">Auto detect</option> -->
+			<div class="item">
+				<select id="fromLang" title="__MSG_TranslateLangSourceTitle__">
+					<option selected value="">__MSG_TranslateLangSource__</option>
 				</select>
 
-				<button id="exchangeFromTo" tooltip="Exchange lang: Shift+Enter" flow="down">&lt;-&gt;</button>
+				<button id="exchangeFromTo" tooltip="__MSG_ExchangeTitle__: Shift+Enter" flow="down">&lt;-&gt;</button>
 
-				<select id="toLang">
-					<option selected value="">English</option>
+				<select id="toLang" title="__MSG_TranslateLangTargetTitle__">
+					<option selected value="en">English</option>
 				</select>
 
-				<button id="translate" title="Ctrl+Enter" flow="right">Translate</button>
+				<button id="translate" title="Ctrl+Enter" flow="right">__MSG_bthTranslate__</button>
 
 				<!-- <button id="buttonSave">save</button>
 					<button id="buttonSaveClear">clear setting</button> -->
 			</div>
 
-			<div class="flex-item">
-				<textarea id="translatedText" readonly="1"></textarea>
-				<!-- <div id="toTextPlayer" class="player_button disabled"></div> -->
+			<div class="item">
+				<textarea id="translatedText" readonly></textarea>
 			</div>
 
 		</div>

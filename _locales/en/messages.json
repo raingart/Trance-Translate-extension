@@ -13,10 +13,34 @@
    },
    "extDescription": {
       "description": "Extension's description",
-      "message": "Trance - is a new easy minimalist translator for your browser. Simple, open-source, no malware, for personal use"
+      "message": "Trance is a easy minimalist translator"
    },
    "extTitle": {
       "description": "Extension's title",
       "message": "Translate Selected"
+   },
+   "AreaTranslateIn": {
+      "description": "AreaTranslate placeholder",
+      "message": "Text to translate"
+   },
+   "TranslateLangSource": {
+      "description": "select Lang default",
+      "message": "Auto detect"
+   },
+   "TranslateLangSourceTitle": {
+      "description": "selec Lang title",
+      "message": "From which language translate"
+   },
+   "ExchangeTitle": {
+      "description": "Exchange title",
+      "message": "Exchange places language translation"
+   },
+   "TranslateLangTargetTitle": {
+      "description": "selec Lang title",
+      "message": "Which language to translate"
+   },
+   "bthTranslate": {
+      "description": "Translate button",
+      "message": "Translate"
    }
 }
