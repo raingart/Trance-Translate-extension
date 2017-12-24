@@ -12,10 +12,11 @@ zip -r $FILENAME.zip \
                   icons/48.png \
                   icons/128.png \
                   js/*.js \
-                  lib/*.js \
-                  html/*.html \
-                  css/*.css \
+                  lib/*.min.js \
+                  html/popup.html \
                   css/*/*.css \
+                  css/*.css \
                   manifest.json \
+                  # html/*.html \
 
  # -z $TODAY

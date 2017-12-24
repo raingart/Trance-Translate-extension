@@ -7,12 +7,18 @@ body {
 	background-attachment: fixed;
 }
 
+.container {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+}
+
 textarea {
 	width: 100%;
 	/* background-color: rgba(255, 255, 255, 0.5); */
 	/* border-color: rgba(0, 0, 0, 0); */
 	resize: vertical;
-	max-height: 150px;
+	max-height: 250px;
 	min-height: 30px;
 	/* transition: all .2s ease; */
 }
@@ -21,13 +27,7 @@ textarea#translatedText {
 	background: #f5f5f5;
 }
 
-.container{
-	display: flex;
-	flex-direction: column;
-	flex-wrap: wrap;
-}
-
-.player_button {
+.playVoice {
 	position: absolute;
 	right: 0;
 	width: 18px;
@@ -37,6 +37,6 @@ textarea#translatedText {
 	overflow: hidden;
 	/* background: #ccc; */
 }
-.player_button > * {
+.playVoice > * {
 	font-size: 1.5em !important;
 }

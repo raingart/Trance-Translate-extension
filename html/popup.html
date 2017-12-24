@@ -3,15 +3,19 @@
 
 <head>
 	<meta charset="utf-8" />
-	<title>Trance Translate</title>
-	<link rel="stylesheet" href="/css/skeleton/normalize.min.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>__MSG_app_name__</title>
+	<link rel="stylesheet" href="/css/normalize.min.css">
 	<link rel="stylesheet" href="/css/tooltip/tooltip.min.css" />
 	<link rel="stylesheet" href="/css/tooltip/tooltip-animation.min.css" />
 	<link rel="stylesheet" href="/css/font-awesome.min.css" />
 	<link rel="stylesheet" href="/css/popup.css" />
 
-	<script src="/js/translation.js"></script>
+	<script src="/lib/localization.min.js"></script>
+	<script src="/lib/storage.min.js"></script>
+
 	<script src="/js/lang.min.js"></script>
+	<script src="/js/translation.js"></script>
 	<script src="/js/popup.js"></script>
 </head>
 
@@ -21,37 +25,33 @@
 		<div class="container">
 			
 			<div class="item">
-				<textarea id="textToTranslate" placeholder="__MSG_AreaTranslateIn__"></textarea>
-				<a href="#" id="textToPlay" class="toTextPlayer player_button"><i class="icon-volume-down"></i></a>
+				<textarea id="translate-text-in" placeholder="__MSG_translate_in_placeholder__"></textarea>
+				<!-- <a href="#" id="bth-voicePlaying" class="playVoice"><i class="icon-volume-down"></i></a> -->
 			</div>
 
 			<div class="item">
-				<select id="fromLang" title="__MSG_TranslateLangSourceTitle__">
-					<option selected value="">__MSG_TranslateLangSource__</option>
+				<select id="fromLang" title="__MSG_translate_choice_source_title__">
+					<option selected value="">__MSG_translate_choice_source__</option>
 				</select>
 
-				<button id="exchangeFromTo" tooltip="__MSG_ExchangeTitle__: Shift+Enter" flow="down">&lt;-&gt;</button>
+				<button id="exchangeFromTo" tooltip="__MSG_translate_choice_exchange_title__: Shift+Enter" flow="down"><i class="icon-exchange"></i><!--&lt;-&gt; --></button>
 
-				<select id="toLang" title="__MSG_TranslateLangTargetTitle__">
-					<option selected value="en">English</option>
+				<select id="toLang" title="__MSG_translate_choice_target_title__">
+					<option selected value="">English</option>
 				</select>
 
-				<button id="translate" title="Ctrl+Enter" flow="right">__MSG_bthTranslate__</button>
+				<button id="bth-translate" title="Ctrl+Enter" flow="right">__MSG_bth_translate__</button>
 
 				<!-- <button id="buttonSave">save</button>
 					<button id="buttonSaveClear">clear setting</button> -->
 			</div>
 
 			<div class="item">
-				<textarea id="translatedText" readonly></textarea>
+				<textarea id="translate-text-out" readonly></textarea>
 			</div>
 
 		</div>
 	</div>
 
-	<script src="/lib/localization.min.js"></script>
-	<script src="/lib/storage.min.js"></script>
-
 </body>
-
 </html>

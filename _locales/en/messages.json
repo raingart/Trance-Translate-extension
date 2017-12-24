@@ -3,44 +3,48 @@
       "description": "Extension's Localization",
       "message": "en"
    },
-   "extName": {
+   "app_name": {
       "description": "Extension's name",
       "message": "Trance Translate"
    },
-   "extShortName": {
+   "app_short_name": {
       "description": "Extension's short name",
-      "message": "Trance Translate"
+      "message": "Trance"
    },
-   "extDescription": {
+   "app_description": {
       "description": "Extension's description",
       "message": "Trance is a easy minimalist translator"
    },
-   "extTitle": {
+   "app_title": {
       "description": "Extension's title",
       "message": "Translate Selected"
    },
-   "AreaTranslateIn": {
-      "description": "AreaTranslate placeholder",
+   "translate_in_placeholder": {
+      "description": "textarea translate-input placeholder",
       "message": "Text to translate"
    },
-   "TranslateLangSource": {
-      "description": "select Lang default",
+   "translate_choice_source": {
+      "description": "current choice default",
       "message": "Auto detect"
    },
-   "TranslateLangSourceTitle": {
+   "translate_choice_source_title": {
       "description": "selec Lang title",
       "message": "From which language translate"
    },
-   "ExchangeTitle": {
+   "translate_choice_exchange_title": {
       "description": "Exchange title",
-      "message": "Exchange places language translation"
+      "message": "Exchange places language"
    },
-   "TranslateLangTargetTitle": {
+   "translate_choice_target_title": {
       "description": "selec Lang title",
       "message": "Which language to translate"
    },
-   "bthTranslate": {
+   "bth_translate": {
       "description": "Translate button",
       "message": "Translate"
+   },
+   "translateContext": {
+      "description": "Translate context menu item",
+      "message": "Translate '%s'"
    }
 }
