@@ -9,7 +9,7 @@ const translateAPI = {
       if (request && request.sourceText) {
          let sl = request.sourceLanguage || 'auto';
          let tl = request.targetLanguage || 'en';
-         let q = request.sourceText;
+         let q = request.sourceText.trim();
 
          let type = request.type || 'json';
          let params = request.params || {};

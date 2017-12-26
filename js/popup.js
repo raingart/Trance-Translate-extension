@@ -1,7 +1,5 @@
 console.log("start " + chrome.i18n.getMessage("app_name"));
 
-// options: JSON.parse(browser.i18n.getMessage("languages")),
-
 // When the popup HTML has loaded
 window.addEventListener('load', (evt) => {
 
@@ -11,45 +9,48 @@ window.addEventListener('load', (evt) => {
 
       translate: (dispatch, apiName, callback) => {
          var dispatch = dispatch || {
-            sourceLanguage: App.ui.getView.sourceLang.value,
-            targetLanguage: App.ui.getView.targetLang.value,
-            sourceText: App.ui.getView.translateIn.value,
+            sourceLanguage: App.ui.getTag.sourceLang.value,
+            targetLanguage: App.ui.getTag.targetLang.value,
+            sourceText: App.ui.getTag.translateIn.value,
          };
-         
+
          if (dispatch.sourceText) {
             var apiName = apiName || 'Google';
             var callback = callback || ((parameter) => {
-               console.log('resirve: ' + JSON.stringify(parameter));
-               App.ui.ui(parameter);
+               console.log('{"resirve"}', JSON.stringify(parameter));
+               App.ui.fill(parameter);
                App.localStorage.update();
                App.ui.showLoading(false);
             });
-            App.ui.showLoading(false);
             App.ui.showLoading(true);
             translateAPI[apiName](dispatch, callback);
          }
       },
 
       ui: {
-         getView: {
+         getTag: {
             sourceLang: document.getElementById('fromLang'),
             targetLang: document.getElementById('toLang'),
-            translateIn: document.getElementById('translate-text-in'),
-            // translateIn: document.querySelectorAll('textarea')[0],
+            translateIn: document.getElementById('translate-text-in') ||
+               document.querySelectorAll('textarea')[0],
             bthTranslate: document.getElementById('bth-translate'),
-            translatedOut: document.getElementById('translate-text-out'),
-            // translatedOut: document.querySelectorAll('textarea')[1],
+            translatedOut: document.getElementById('translate-text-out') ||
+               document.querySelectorAll('textarea')[1],
             // textToPlay: document.getElementById("bth-voicePlaying")
          },
 
-         ui: (parameter) => {
-            App.ui.getView.translatedOut.value = parameter.translatedText;
-            // App.ui.setSelectedValue(App.ui.getView.sourceLang, parameter.detectLang);
-            if (App.ui.getView.sourceLang.value == '') {
-               App.ui.getView.sourceLang[0].innerHTML = chrome.i18n.getMessage("translate_choice_source") + ' (' + lang[parameter.detectLang] + ')';
+         fill: (parameter) => {
+            App.ui.getTag.translateIn.value = App.ui.getTag.translateIn.value.trim();
+            App.ui.getTag.translatedOut.value = parameter.translatedText;
+            // App.ui.setSelectedValue(App.ui.getTag.sourceLang, parameter.detectLang);
+            if (App.ui.getTag.sourceLang.value == '') {
+               App.ui.getTag.sourceLang[0].innerHTML = chrome.i18n.getMessage("translate_choice_source") + ' (' + lang[parameter.detectLang] + ')';
             }
-            App.ui.getView.translateIn.focus();
-            App.ui.autoExpand(App.ui.getView.translatedOut);
+
+            App.ui.autoExpand(App.ui.getTag.translateIn);
+            App.ui.autoExpand(App.ui.getTag.translatedOut);
+
+            App.ui.getTag.translateIn.focus();
          },
 
          showLoading: (status) => {
@@ -57,7 +58,7 @@ window.addEventListener('load', (evt) => {
             if (status) {
                var text = "loading";
                App.temploadingMessage = setInterval(() => {
-                  App.ui.getView.translatedOut.value = text + Array((++i % 4) + 1).join(".");
+                  App.ui.getTag.translatedOut.value = text + Array((++i % 4) + 1).join(".");
                }, 300);
             } else {
                clearInterval(App.temploadingMessage);
@@ -79,16 +80,16 @@ window.addEventListener('load', (evt) => {
          // },
 
          exchangeLanguages: () => {
-            // var fromLang_temp = App.getSelectedValue(App.ui.getView.sourceLang.value);
-            // var toLang_temp = App.getSelectedValue(App.ui.getView.targetLang.value);
-            var fromLang_temp = App.ui.getView.sourceLang.value;
-            var toLang_temp = App.ui.getView.targetLang.value;
+            // var fromLang_temp = App.getSelectedValue(App.ui.getTag.sourceLang.value);
+            // var toLang_temp = App.getSelectedValue(App.ui.getTag.targetLang.value);
+            var fromLang_temp = App.ui.getTag.sourceLang.value;
+            var toLang_temp = App.ui.getTag.targetLang.value;
 
-            App.ui.setSelectedValue(App.ui.getView.sourceLang, toLang_temp);
-            App.ui.setSelectedValue(App.ui.getView.targetLang, fromLang_temp);
+            App.ui.setSelectedValue(App.ui.getTag.sourceLang, toLang_temp);
+            App.ui.setSelectedValue(App.ui.getTag.targetLang, fromLang_temp);
 
-            var a = App.ui.getView.translateIn;
-            var b = App.ui.getView.translatedOut;
+            var a = App.ui.getTag.translateIn;
+            var b = App.ui.getTag.translatedOut;
             if (a.value == '') {
                b.value = [a.value, a.value = b.value][0];
             }
@@ -117,10 +118,32 @@ window.addEventListener('load', (evt) => {
          //    return e
          // },
       },
-      openUrl: (url, isActiveTab) => {
+
+      getSelectionText: () => {
+         try {
+            // chrome.tabs.getSelected(null, function(tab){
+            // chrome.tabs.query({active: true, currentWindow: true}, function(arrayOfTabs) {
+            // console.log('tab.id:'+tab.url);
+            chrome.tabs.executeScript( /*tab.id,*/ {
+               code: "window.getSelection().toString();",
+               allFrames: true
+            }, function (selection) {
+               App.log('getSelectionText:', selection);
+               if (selection && selection[0]) {
+                  App.ui.getTag.translateIn.value = selection[0];
+                  App.translate();
+               }
+            });
+            //   });
+         } catch (error) {
+
+         }
+      },
+
+      openUrl: (url, tab) => {
          chrome.tabs.create({
             url: url,
-            selected: isActiveTab
+            selected: tab
          })
       },
 
@@ -131,15 +154,16 @@ window.addEventListener('load', (evt) => {
                chrome.storage.local.clear();
 
             var options_Storage = {};
-            options_Storage.fromLang = App.ui.getView.sourceLang.value;
-            options_Storage.toLang = App.ui.getView.targetLang.value;
-            options_Storage['translate-text-in'] = App.ui.getView.translateIn.value;
+            options_Storage.fromLang = App.ui.getTag.sourceLang.value;
+            options_Storage.toLang = App.ui.getTag.targetLang.value;
+            options_Storage['translate-text-in'] = App.ui.getTag.translateIn.value;
+            options_Storage['translate-text-out'] = App.ui.getTag.translatedOut.value;
 
             Storage.setParams(options_Storage, chrome.storage.local);
          },
 
          // Restores select box state to saved value from localStorage/chromeSync.
-         loadFillOpt: (base) => {
+         fillOptValue: (base) => {
             App.log("Load the localStorageuration from localStorage: \n" + JSON.stringify(base));
             for (var property in base) {
                var item = base[property];
@@ -176,26 +200,20 @@ window.addEventListener('load', (evt) => {
 
       init: () => {
          App.log('App Init');
-         // console.log('isFirstRun:', !App.localStorage.exists("isFirstRun"));
-         // if (!App.localStorage.exists("isFirstRun")) {
-         //    // App.localStorage.loadDefaultSettings();
-         //    // App.localStorage.loadFill();
-         //    App.openUrl("/html/settings.html")
-         // } else {
-         //    Storage.getParams(null, App.localStorage.loadFillOpt, chrome.storage.local);
-         // }
-         Storage.getParams(null, App.localStorage.loadFillOpt, chrome.storage.local);
+         
+         Storage.getParams(null,
+            (r) => {
+               App.localStorage.fillOptValue(r)
+               App.ui.autoExpand(App.ui.getTag.translateIn);
+               App.ui.autoExpand(App.ui.getTag.translatedOut);
+            }, chrome.storage.local);
 
-         App.ui.loadLangList(App.ui.getView.sourceLang, lang);
-         App.ui.loadLangList(App.ui.getView.targetLang, lang);
-         App.ui.getView.translateIn.focus();
+         App.getSelectionText();
 
-         //    var t = "selectionText";
-         //   var n = 'ognt';
-         //   var r = "auto";
+         App.ui.loadLangList(App.ui.getTag.sourceLang, lang);
+         App.ui.loadLangList(App.ui.getTag.targetLang, lang);
 
-         //    var i = "http://translate.google.com/#" + r + "|" + '' + "|" + encodeURIComponent(t);
-         //    App.browser.openUrl(i, n === "ognt" ? true : false)
+         App.ui.getTag.translateIn.focus();
       },
 
       log: (msg) => {
@@ -224,22 +242,11 @@ window.addEventListener('load', (evt) => {
    // };
 
    // Register the event handlers.
-   App.ui.getView.translateIn.addEventListener("input", function () {
-      App.ui.autoExpand(this)
+   App.ui.getTag.translateIn.addEventListener("input", function () {
+      App.ui.autoExpand(this);
    });
 
-   App.ui.getView.translatedOut.addEventListener("click", function () {
-      this.select();
-   });
-
-
-   // buttonSave.addEventListener("click", function (e) {
-   //     App.localStorage.update();
-   // });
-
-   // buttonSaveClear.addEventListener("click", function (e) {
-   //     App.localStorage.update(true);
-   // });
+  
    // document.getElementById("fromTextPlayer").addEventListener("click", function(event) { fromLangListener.play(this); }, false);
 
    // mouse move event
@@ -251,47 +258,17 @@ window.addEventListener('load', (evt) => {
    //   }, false);
 
    // document.getElementById("bth-voicePlaying").addEventListener("click", function (e) {
-   //    //    App.ui.getView.textToPlay.addEventListener("click", function (e) {
+   //    //    App.ui.getTag.textToPlay.addEventListener("click", function (e) {
    //    var classes = this.querySelectorAll('i')[0]
    //    classes.classList.toggle("icon-volume-down");
    //    classes.classList.toggle("icon-volume-up");
    // });
 
    exchangeFromTo.addEventListener("click", App.ui.exchangeLanguages, false);
-   //    exchangeFromTo.addEventListener("click", (e) => {
-   //       App.ui.exchangeLanguages();
-   //    });
 
-   App.ui.getView.bthTranslate.addEventListener("click", (e) => {
+   App.ui.getTag.bthTranslate.addEventListener("click", (e) => {
       App.translate();
    });
-
-   // chrome.tabs.getSelected(null, function(tab) {
-   //     chrome.tabs.sendRequest(tab.id, {method: 'getSelection'}, function (response) {
-   //     //   document.getElementById('textToTranslate').value = response.data;
-   //       console.log(response) ;
-   //     });
-   //   });
-
-   chrome.runtime.getBackgroundPage((eventPage) => {
-      // Call the getPageInfo function in the event page, passing in 
-      // our onPageDetailsReceived function as the callback. This injects 
-      // content.js into the current tab's HTML
-      eventPage.Background.getPageDetails(function (details) {
-         // if (details.summary) {
-         App.ui.getView.translateIn.value = details.summary;
-         App.translate();
-         // }
-      });
-   });
-
-   //    chrome.tabs.getSelected(null, function(tab) {
-
-   //       // Get the selected text. 
-   //     chrome.tabs.sendMessage(tab.id, { method: "translateSelectedText" }, function (response) {	
-   //       // alert(2)
-   // });
-   // });
 
    App.init();
 

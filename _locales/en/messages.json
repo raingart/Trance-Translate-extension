@@ -45,6 +45,6 @@
    },
    "translateContext": {
       "description": "Translate context menu item",
-      "message": "Translate '%s'"
+      "message": "Translate \"%s\""
    }
 }

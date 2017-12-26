@@ -1,42 +1,50 @@
 body {
-	min-width: 450px;
-	background: #184d89;
-	background: linear-gradient(45deg, #ea5959 0%, #184d89 100%);
-	background-repeat: no-repeat;
-	color: #000000;
-	background-attachment: fixed;
+   min-width: 450px;
+   background: #184d89;
+   background: linear-gradient(45deg, #ea5959 0%, #184d89 100%);
+   background-repeat: no-repeat;
+   color: #000000;
+   background-attachment: fixed;
+   /* font-size: 0.3em; */
 }
 
 .container {
-	display: flex;
-	flex-direction: column;
-	flex-wrap: wrap;
+   display: flex;
+   flex-direction: column;
+   flex-wrap: wrap;
+}
+
+input,
+select {
+   font-size: 1.1em;
 }
 
 textarea {
-	width: 100%;
-	/* background-color: rgba(255, 255, 255, 0.5); */
-	/* border-color: rgba(0, 0, 0, 0); */
-	resize: vertical;
-	max-height: 250px;
-	min-height: 30px;
-	/* transition: all .2s ease; */
+   width: 100%;
+   /* background-color: rgba(255, 255, 255, 0.5); */
+   /* border-color: rgba(0, 0, 0, 0); */
+   resize: vertical;
+   max-height: 250px;
+   min-height: 30px;
+   /* transition: all .2s ease; */
+   font-size: 13px;
 }
 
-textarea#translatedText {
-	background: #f5f5f5;
+textarea#translate-text-out{
+   background: #f5f5f5;
 }
 
 .playVoice {
-	position: absolute;
-	right: 0;
-	width: 18px;
-	height: 18px;
-	margin-top: -20px;
-	text-decoration: none;
-	overflow: hidden;
-	/* background: #ccc; */
+   position: absolute;
+   right: 0;
+   width: 18px;
+   height: 18px;
+   margin-top: -20px;
+   text-decoration: none;
+   overflow: hidden;
+   /* background: #ccc; */
 }
-.playVoice > * {
-	font-size: 1.5em !important;
+
+.playVoice>* {
+   font-size: 1.5em !important;
 }
