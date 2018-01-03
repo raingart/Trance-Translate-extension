@@ -14,22 +14,42 @@ var Core = {
    },
    init: function () {
       console.log('Core.init()');
+      Storage.getParams(null, (e) => {
+         Core["conf"] = e;
+         Core.conf.fromLang = e.fromLang || "auto";
+         Core.conf.toLang = e.toLang || "en";
+      }, chrome.storage.local);
       Core.createContextMenu('selection-translate-google');
    },
 };
 
 // Register the event handlers.
 chrome.contextMenus.onClicked.addListener(function (clickData, tab) {
-   console.log('clickData.menuItemId:', clickData.menuItemId);
-
+   // console.log('clickData.menuItemId:', clickData.menuItemId);
    if (clickData.menuItemId == "selection-translate-google") {
       var url = "https://translate.google.com/#" +
-         "auto" + "|" +
-         "ru" + "|" +
+         Core.conf.fromLang + "|" +
+         Core.conf.toLang + "|" +
          encodeURIComponent(clickData.selectionText);
-      // Core.openUrl(url)
-      prompt("Copy text below", url); 
+         
+      Core.openUrl(url)
+      // prompt("Copy text below", url); 
    }
 });
 
 Core.init();
+
+// when install or update new version fired
+browser.runtime.onInstalled && browser.runtime.onInstalled.addListener((detail) => {
+   if(detail.reason === 'update') {
+      //  if(parseInt(detail.previousVersion.replace(/\./g, '')) < 213) { // 更新此版本(v2.1.3)需要清除用户设置
+      //      browser.storage.local.clear();
+      //  }
+   }
+});
+
+// when update available
+browser.runtime.onUpdateAvailable && browser.runtime.onUpdateAvailable.addListener((detail) => {
+   console.log(`Have a new version:${detail.version}`);
+   browser.runtime.reload();  // install new version soon
+});

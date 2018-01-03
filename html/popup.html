@@ -26,7 +26,7 @@
 			
 			<div class="item">
 				<textarea id="translate-text-in" placeholder="__MSG_translate_in_placeholder__"></textarea>
-				<!-- <a href="#" id="bth-voicePlaying" class="playVoice"><i class="icon-volume-down"></i></a> -->
+				<a href="#" id="btn-textIn-to-speak" class="playVoice"><i class="icon-volume-down"></i></a>
 			</div>
 
 			<div class="item">
@@ -40,7 +40,9 @@
 					<option selected value="">English</option>
 				</select>
 
-				<button id="bth-translate" title="Ctrl+Enter" flow="right">__MSG_bth_translate__</button>
+            <button id="bth-translate" title="Ctrl+Enter" flow="right">__MSG_bth_translate__</button>
+            
+				<button tooltip="translate this page in new tab">active tab</button>
 
 				<!-- <button id="buttonSave">save</button>
 					<button id="buttonSaveClear">clear setting</button> -->
@@ -48,8 +50,10 @@
 
 			<div class="item">
 				<textarea id="translate-text-out" readonly></textarea>
-				<!-- <a href="#" id="bth-voicePlaying" class="playVoice"><i class="icon-volume-down"></i></a> -->
-			</div>
+				<a href="#" id="btn-textOut-to-speak" class="playVoice"><i class="icon-volume-down"></i></a>
+         </div>
+         
+         <button id="bth-translate-page" tooltip="translate this page in new tab">translate this page</button>
 
 		</div>
 	</div>

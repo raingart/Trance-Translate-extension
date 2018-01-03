@@ -4,53 +4,78 @@ console.log("start " + chrome.i18n.getMessage("app_name"));
 window.addEventListener('load', (evt) => {
 
    const App = {
-      debug: false,
       // debug: true,
+
+      langlist: lang,
+
+      analytics: () => {
+         var x = document.createElement('script');
+         x.src = '/lib/analytics.min.js';
+         document.getElementsByTagName("head")[0].appendChild(x);
+      },
+      // <script src="/lib/analytics.min.js"></script>,
 
       translate: (dispatch, apiName, callback) => {
          var dispatch = dispatch || {
-            sourceLanguage: App.ui.getTag.sourceLang.value,
-            targetLanguage: App.ui.getTag.targetLang.value,
-            sourceText: App.ui.getTag.translateIn.value,
+            from: App.getUI.htmlTag.sourceLang.value,
+            to: App.getUI.htmlTag.targetLang.value,
+            q: App.getUI.htmlTag.textareaFrom.value,
          };
 
-         if (dispatch.sourceText) {
+         if (dispatch.q) {
             var apiName = apiName || 'Google';
             var callback = callback || ((parameter) => {
                console.log('{"resirve"}', JSON.stringify(parameter));
-               App.ui.fill(parameter);
+               App.getUI.fill(parameter);
                App.localStorage.update();
-               App.ui.showLoading(false);
+               App.getUI.showLoading(false);
             });
-            App.ui.showLoading(true);
-            translateAPI[apiName](dispatch, callback);
+            App.getUI.showLoading(true);
+            translateAPI[apiName].translatedText(dispatch, callback);
          }
       },
 
-      ui: {
-         getTag: {
+      translatePage: () => {
+         chrome.tabs.query({
+            active: true,
+            lastFocusedWindow: true
+         }, function (tabs) {
+            var tab = tabs[0];
+            App.log('translate active url:', tab.url);
+            App.openUrl(
+               'https://translate.google.com/translate?' +
+               '&sl=' + 'auto' +
+               "&tl=" + App.getUI.htmlTag.targetLang.value +
+               "&u=" + tab.url);
+         });
+      },
+
+      getUI: {
+         htmlTag: {
             sourceLang: document.getElementById('fromLang'),
             targetLang: document.getElementById('toLang'),
-            translateIn: document.getElementById('translate-text-in') ||
+            textareaFrom: document.getElementById('translate-text-in') ||
                document.querySelectorAll('textarea')[0],
             bthTranslate: document.getElementById('bth-translate'),
-            translatedOut: document.getElementById('translate-text-out') ||
+            textareaOut: document.getElementById('translate-text-out') ||
                document.querySelectorAll('textarea')[1],
-            // textToPlay: document.getElementById("bth-voicePlaying")
+
+            textInToSpeak: document.getElementById('btn-textIn-to-speak'),
+            textOutToSpeak: document.getElementById('btn-textOut-to-speak'),
          },
 
          fill: (parameter) => {
-            App.ui.getTag.translateIn.value = App.ui.getTag.translateIn.value.trim();
-            App.ui.getTag.translatedOut.value = parameter.translatedText;
-            // App.ui.setSelectedValue(App.ui.getTag.sourceLang, parameter.detectLang);
-            if (App.ui.getTag.sourceLang.value == '') {
-               App.ui.getTag.sourceLang[0].innerHTML = chrome.i18n.getMessage("translate_choice_source") + ' (' + lang[parameter.detectLang] + ')';
+            App.getUI.htmlTag.textareaFrom.value = App.getUI.htmlTag.textareaFrom.value.trim();
+            App.getUI.htmlTag.textareaOut.value = parameter.translatedText;
+            // App.getUI.setSelectedValue(App.getUI.htmlTag.sourceLang, parameter.detectLang);
+            if (App.getUI.htmlTag.sourceLang.value == '') {
+               App.getUI.htmlTag.sourceLang[0].innerHTML = chrome.i18n.getMessage("translate_choice_source") + ' (' + App.langlist[parameter.detectLang] + ')';
             }
 
-            App.ui.autoExpand(App.ui.getTag.translateIn);
-            App.ui.autoExpand(App.ui.getTag.translatedOut);
+            App.getUI.autoExpand(App.getUI.htmlTag.textareaFrom);
+            App.getUI.autoExpand(App.getUI.htmlTag.textareaOut);
 
-            App.ui.getTag.translateIn.focus();
+            App.getUI.htmlTag.textareaFrom.focus();
          },
 
          showLoading: (status) => {
@@ -58,7 +83,7 @@ window.addEventListener('load', (evt) => {
             if (status) {
                var text = "loading";
                App.temploadingMessage = setInterval(() => {
-                  App.ui.getTag.translatedOut.value = text + Array((++i % 4) + 1).join(".");
+                  App.getUI.htmlTag.textareaOut.value = text + Array((++i % 4) + 1).join(".");
                }, 300);
             } else {
                clearInterval(App.temploadingMessage);
@@ -80,16 +105,16 @@ window.addEventListener('load', (evt) => {
          // },
 
          exchangeLanguages: () => {
-            // var fromLang_temp = App.getSelectedValue(App.ui.getTag.sourceLang.value);
-            // var toLang_temp = App.getSelectedValue(App.ui.getTag.targetLang.value);
-            var fromLang_temp = App.ui.getTag.sourceLang.value;
-            var toLang_temp = App.ui.getTag.targetLang.value;
+            // var fromLang_temp = App.getSelectedValue(App.getUI.htmlTag.sourceLang.value);
+            // var toLang_temp = App.getSelectedValue(App.getUI.htmlTag.targetLang.value);
+            var fromLang_temp = App.getUI.htmlTag.sourceLang.value;
+            var toLang_temp = App.getUI.htmlTag.targetLang.value;
 
-            App.ui.setSelectedValue(App.ui.getTag.sourceLang, toLang_temp);
-            App.ui.setSelectedValue(App.ui.getTag.targetLang, fromLang_temp);
+            App.getUI.setSelectedValue(App.getUI.htmlTag.sourceLang, toLang_temp);
+            App.getUI.setSelectedValue(App.getUI.htmlTag.targetLang, fromLang_temp);
 
-            var a = App.ui.getTag.translateIn;
-            var b = App.ui.getTag.translatedOut;
+            var a = App.getUI.htmlTag.textareaFrom;
+            var b = App.getUI.htmlTag.textareaOut;
             if (a.value == '') {
                b.value = [a.value, a.value = b.value][0];
             }
@@ -100,9 +125,9 @@ window.addEventListener('load', (evt) => {
             t.style.height = t.scrollHeight + 'px'
          },
 
-         loadLangList: (outSelected, loadOptionVal) => {
+         fillSelected: (outSelected, loadOptionVal) => {
             for (var i in loadOptionVal) {
-               outSelected.options[outSelected.options.length] = new Option(lang[i], i.toLowerCase());
+               outSelected.options[outSelected.options.length] = new Option(loadOptionVal[i], i);
             }
          },
 
@@ -117,6 +142,22 @@ window.addEventListener('load', (evt) => {
          //    }
          //    return e
          // },
+
+         textToSpeak: (e, args) => {
+            e.classList.add("disabled");
+            var ico = e.querySelectorAll('i')[0];
+            ico.classList.toggle("icon-volume-down");
+            ico.classList.add("icon-volume-up");
+
+            translateAPI.Google.speakText(args, function (outAudio) {
+               outAudio.start(0);
+               setTimeout(() => {
+                  ico.classList.toggle("icon-volume-down");
+                  ico.classList.remove("icon-volume-up");
+                  e.classList.remove("disabled");
+               }, 1000);
+            });
+         }
       },
 
       getSelectionText: () => {
@@ -130,13 +171,16 @@ window.addEventListener('load', (evt) => {
             }, function (selection) {
                App.log('getSelectionText:', selection);
                if (selection && selection[0]) {
-                  App.ui.getTag.translateIn.value = selection[0];
+                  App.getUI.htmlTag.textareaFrom.value = selection[0];
                   App.translate();
                }
             });
             //   });
-         } catch (error) {
-
+         } catch (err) {
+            var e = new Error();
+            e.code = 'NO_ACCESS_TAB';
+            e.message = err.message;
+            reject(e);
          }
       },
 
@@ -154,12 +198,12 @@ window.addEventListener('load', (evt) => {
                chrome.storage.local.clear();
 
             var options_Storage = {};
-            options_Storage.fromLang = App.ui.getTag.sourceLang.value;
-            options_Storage.toLang = App.ui.getTag.targetLang.value;
-            options_Storage['translate-text-in'] = App.ui.getTag.translateIn.value;
-            options_Storage['translate-text-out'] = App.ui.getTag.translatedOut.value;
+            options_Storage.fromLang = App.getUI.htmlTag.sourceLang.value;
+            options_Storage.toLang = App.getUI.htmlTag.targetLang.value;
+            options_Storage['translate-text-in'] = App.getUI.htmlTag.textareaFrom.value;
+            options_Storage['translate-text-out'] = App.getUI.htmlTag.textareaOut.value;
 
-            Storage.setParams(options_Storage, chrome.storage.local);
+            return Storage.setParams(options_Storage, chrome.storage.local);
          },
 
          // Restores select box state to saved value from localStorage/chromeSync.
@@ -172,7 +216,7 @@ window.addEventListener('load', (evt) => {
                if (opt) {
                   App.log("opt tag> " + property + ":" + item);
                   if (opt.options) {
-                     App.ui.setSelectedValue(opt, item);
+                     App.getUI.setSelectedValue(opt, item);
                   } else {
                      opt.value = item
                   }
@@ -200,26 +244,35 @@ window.addEventListener('load', (evt) => {
 
       init: () => {
          App.log('App Init');
-         
+
          Storage.getParams(null,
             (r) => {
                App.localStorage.fillOptValue(r)
-               App.ui.autoExpand(App.ui.getTag.translateIn);
-               App.ui.autoExpand(App.ui.getTag.translatedOut);
+               App.getUI.autoExpand(App.getUI.htmlTag.textareaFrom);
+               App.getUI.autoExpand(App.getUI.htmlTag.textareaOut);
             }, chrome.storage.local);
 
          App.getSelectionText();
 
-         App.ui.loadLangList(App.ui.getTag.sourceLang, lang);
-         App.ui.loadLangList(App.ui.getTag.targetLang, lang);
+         App.getUI.fillSelected(App.getUI.htmlTag.sourceLang, App.langlist);
+         App.getUI.fillSelected(App.getUI.htmlTag.targetLang, App.langlist);
 
-         App.ui.getTag.translateIn.focus();
+         App.getUI.htmlTag.textareaFrom.focus();
+
+         // if (!App.debug)
+         //    App.analytics();
       },
 
       log: (msg) => {
          if (App.debug)
-            console.log('>> ' + msg.toString())
+            return console.log('>> ' + msg.toString())
       }
+
+      // langlist: lang.map(code => code.toLowerCase()),
+      // return x<y ? -1 : x>y ? 1 : 0;
+      // langlist: lang.forEach(function(value, key) {
+      //    // console.log(key + ' = ' + value);
+      //  }),
    };
 
 
@@ -232,7 +285,7 @@ window.addEventListener('load', (evt) => {
          // return false;
       } else if (e.shiftKey && e.which == 13) { //shift+Enter
          console.log('shift+Enter');
-         App.ui.exchangeLanguages();
+         App.getUI.exchangeLanguages();
          return false;
          // } else if (e.which == 13) { //Enter
          //     App.translate();eventPage
@@ -242,11 +295,11 @@ window.addEventListener('load', (evt) => {
    // };
 
    // Register the event handlers.
-   App.ui.getTag.translateIn.addEventListener("input", function () {
-      App.ui.autoExpand(this);
+   App.getUI.htmlTag.textareaFrom.addEventListener("input", function () {
+      App.getUI.autoExpand(this);
    });
 
-  
+
    // document.getElementById("fromTextPlayer").addEventListener("click", function(event) { fromLangListener.play(this); }, false);
 
    // mouse move event
@@ -257,17 +310,28 @@ window.addEventListener('load', (evt) => {
    //       pageY = e.pageY;
    //   }, false);
 
-   // document.getElementById("bth-voicePlaying").addEventListener("click", function (e) {
-   //    //    App.ui.getTag.textToPlay.addEventListener("click", function (e) {
-   //    var classes = this.querySelectorAll('i')[0]
-   //    classes.classList.toggle("icon-volume-down");
-   //    classes.classList.toggle("icon-volume-up");
-   // });
+   App.getUI.htmlTag.textInToSpeak.onclick = function () {
+      App.getUI.textToSpeak(this, {
+         textToSpeak: App.getUI.htmlTag.textareaFrom.value,
+         to: App.getUI.htmlTag.sourceLang.value,
+      });
+   };
 
-   exchangeFromTo.addEventListener("click", App.ui.exchangeLanguages, false);
+   App.getUI.htmlTag.textOutToSpeak.onclick = function () {
+      App.getUI.textToSpeak(this, {
+         textToSpeak: App.getUI.htmlTag.textareaOut.value,
+         to: App.getUI.htmlTag.targetLang.value,
+      });
+   };
 
-   App.ui.getTag.bthTranslate.addEventListener("click", (e) => {
+   exchangeFromTo.addEventListener("click", App.getUI.exchangeLanguages, false);
+
+   App.getUI.htmlTag.bthTranslate.addEventListener("click", (e) => {
       App.translate();
+   });
+
+   document.getElementById('bth-translate-page').addEventListener("click", (e) => {
+      ApplicationCache.translatePage();
    });
 
    App.init();

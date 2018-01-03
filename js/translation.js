@@ -1,80 +1,155 @@
 console.log('init translate');
 
 const translateAPI = {
-   debug: false,
-   
-   Google: (request, callback) => {
-      translateAPI.log('google translate input:\n', JSON.stringify(request));
+   // debug: true,
 
-      if (request && request.sourceText) {
-         let sl = request.sourceLanguage || 'auto';
-         let tl = request.targetLanguage || 'en';
-         let q = request.sourceText.trim();
-
-         let type = request.type || 'json';
-         let params = request.params || {};
-
-         let url = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t" +
-            '&sl=' + sl + 
-            "&tl=" + tl + 
-            "&q=" + encodeURI(q);
-         translateAPI.log('url:', url);
-
-         fetch(url, params) // async
-            .then((res) => { //response checkStatus
-               if (res.status >= 200 && res.status < 300) {
-                  return Promise.resolve(res);
-               } else {
-                  return Promise.reject(new Error(res.statusText));
-               }
-            })
-            .then((res) => {
-               switch (type) {
-                  case 'text':
-                     return res.text();
-                  case 'json':
-                     return res.json();
-                  case 'arrayBuffer':
-                     return res.arrayBuffer();
-                  // default:
-                  //    return res.json();
-               }
-            })
-            .then((res) => {
-               translateAPI.log('[' + res.status + '] Request succeeded with JSON response', res);
-               if (callback && typeof (callback) === "function") {
-                  var res = translateAPI.clearResonse(res);
-                  return callback(res);
-               }
-            })
-            .catch((err) => {
-               console.warn('[fetching translate data error]:', err);
-               return false;
-            });
-      } else {
-         console.warn('empty sourceText: ' + request.sourceText);
-         return false;
-      }
-   },
-   
-   clearResonse: function (res) {
-      // translateAPI.log('resirve: ' + JSON.stringify(res));
-      return {
-         'sourceText': res[0][0][1],
-         'translatedText': function () {
-            var p = '';
-            for (var i in res[0]) {
-               p += res[0][i][0];
-               // translateAPI.log('translatedText: ' + p);
+   fetch_a: (url, params, type, callback) => {
+      // let result = JSON.parse(UrlFetchApp.fetch(url).getContentText());
+      fetch(url, params) // async
+         // .then((res) => { //response checkStatus
+         //    if (res.status >= 200 && res.status < 300) {
+         //       return Promise.resolve(res);
+         //    } else {
+         //       return Promise.reject(new Error(res.statusText));
+         //    }
+         // })
+         .then((response) => {
+            translateAPI.log('url:', url);
+            if (response.status >= 200 && response.status < 300) {
+               return response;
+            } else {
+               let error = new Error(response.statusText);
+               error.response = response;
+               throw error;
             }
-            return p;
-         }(), //res[0][0][0],
-         'detectLang': res[2]
-      }
+         })
+         .then((response) => {
+            switch (type) {
+               case 'text':
+                  return response.text();
+               case 'json':
+                  return response.json();
+               case 'arrayBuffer':
+                  return response.arrayBuffer();
+               default:
+                  return response.text();
+            }
+         })
+         .then((res) => {
+            translateAPI.log('Request succeeded with response', res);
+            if (callback && typeof (callback) === "function") {
+               return callback(res);
+            } else 
+               return res;
+         })
+         .catch((err) => {
+            console.warn('[fetching translate data error]:', err);
+            return false;
+         });
    },
 
-   log: (msg) => {
+   Google: {
+      speakText: (args, callback) => {
+         translateAPI.log('Start Speaking!:\n', JSON.stringify(args));
+
+         if (args && args.textToSpeak) {
+
+         let textToSpeak = args.textToSpeak.trim();
+         let targetLanguage = args.to || 'en';
+
+         textToSpeak = textToSpeak.replace(/%20| /g, '+');
+         if (textToSpeak.substr(0, 1) == ' ' || textToSpeak.substr(0, 1) == '+') {
+            textToSpeak = textToSpeak.substr(1, textToSpeak.length - 1);
+            translateAPI.log(textToSpeak);
+         }
+
+         let soundUrl = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob' +
+            '&tl=' + targetLanguage +
+            '&q=' + textToSpeak;
+
+         let type = args.type || 'arrayBuffer';
+         let params = args.params || {};
+
+         let audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+         let source = audioCtx.createBufferSource();
+
+         let _callback = ((buffer) => {
+            audioCtx.decodeAudioData(buffer, function (decodedData) {
+               source.buffer = decodedData;
+               source.connect(audioCtx.destination);
+               // source.loop = true;
+               // source.start(0);
+            });
+            // let audio = document.createElement('audio');
+            // audio.onerror = function (event) {
+            //    audio.onerror = null;
+            //    audio.src = soundUrl;
+            // };
+            // audio.src = soundUrl;
+            // audio.autoplay = true;
+            // audio.play();
+            if (callback && typeof (callback) === "function") {
+               return callback(source);
+            }
+         });
+
+         translateAPI.fetch_a(soundUrl, params, type, _callback);
+      } else {
+            console.warn('textToSpeak empty:', request.textToSpeak);
+            return false;
+         }
+      },
+
+
+      translatedText: (request, callback) => {
+         translateAPI.log('google translate input:\n', JSON.stringify(request));
+
+         if (request && request.q) {
+            let sourceLang = request.from || 'auto';
+            let targetLang = request.to || 'en';
+            let sourceText = request.q.trim();
+
+            let type = request.type || 'json';
+            let params = request.params || {};
+
+            let url = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t" +
+               '&sl=' + sourceLang +
+               "&tl=" + targetLang +
+               "&q=" + encodeURI(sourceText);
+
+            let _callback = ((res) => {
+               let translatedOut = translateAPI.Google.clearResonse(res);
+               if (callback && typeof (callback) === "function") {
+                  return callback(translatedOut);
+               }
+            });
+
+            translateAPI.fetch_a(url, params, type, _callback);
+         } else {
+            console.warn('sourceText empty:', request.q);
+            return false;
+         }
+      },
+
+      clearResonse: function (res) {
+         translateAPI.log('resirve: ' + JSON.stringify(res));
+         return {
+            'sourceText': res[0][0][1],
+            'translatedText': function () {
+               let p = '';
+               for (let i in res[0]) { //res[0][0][0]
+                  p += res[0][i][0];
+                  // translateAPI.log('translatedText: ' + p);
+               }
+               return p;
+            }(), //res[0][0][0],
+            'detectLang': res[2]
+         }
+      },
+   },
+
+   log: (msg, msg1) => {
       if (translateAPI.debug)
-         translateAPI.log('>> ' + msg.toString())
+         console.log('>> ' + msg.toString(), msg1)
    }
 };
