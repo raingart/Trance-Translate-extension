@@ -1,8 +1,10 @@
+console.log(chrome.i18n.getMessage("app_name") + ": init background.js");
+
 var Core = {
    createContextMenu: (menuItemId) => {
       chrome.contextMenus.create({
          id: menuItemId || 'test',
-         title: chrome.i18n.getMessage("translateContext"),
+         title: chrome.i18n.getMessage("translate_context_menu"),
          contexts: ["selection"]
       });
    },
@@ -42,8 +44,9 @@ Core.init();
 // when install or update new version fired
 browser.runtime.onInstalled && browser.runtime.onInstalled.addListener((detail) => {
    if(detail.reason === 'update') {
-      //  if(parseInt(detail.previousVersion.replace(/\./g, '')) < 213) { // 更新此版本(v2.1.3)需要清除用户设置
-      //      browser.storage.local.clear();
+      //  if(parseInt(detail.previousVersion.replace(/\./g, '')) < 213) { // (v2.1.3)
+      //      chrome.storage.local.clear();
+      //      alert('app updated');
       //  }
    }
 });

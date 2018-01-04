@@ -14,7 +14,7 @@ zip -r $FILENAME.zip \
                   js/*.js \
                   lib/*.min.js \
                   html/popup.html \
-                  css/*/*.css \
+                  css/tooltip/*.css \
                   css/*.css \
                   manifest.json \
                   # html/*.html \

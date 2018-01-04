@@ -2,61 +2,73 @@
 <html>
 
 <head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>__MSG_app_name__</title>
-	<link rel="stylesheet" href="/css/normalize.min.css">
-	<link rel="stylesheet" href="/css/tooltip/tooltip.min.css" />
-	<link rel="stylesheet" href="/css/tooltip/tooltip-animation.min.css" />
-	<link rel="stylesheet" href="/css/font-awesome.min.css" />
-	<link rel="stylesheet" href="/css/popup.css" />
+   <meta charset="utf-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>__MSG_app_name__</title>
+   <link rel="stylesheet" href="/css/normalize.min.css">
+   <link rel="stylesheet" href="/css/tooltip/tooltip.min.css" />
+   <link rel="stylesheet" href="/css/tooltip/tooltip-animation.min.css" />
+   <link rel="stylesheet" href="/css/font-awesome.min.css" />
+   <link rel="stylesheet" href="/css/popup.css" />
 
-	<script src="/lib/localization.min.js"></script>
-	<script src="/lib/storage.min.js"></script>
+   <script src="/lib/localization.min.js"></script>
+   <script src="/lib/storage.min.js"></script>
 
-	<script src="/js/lang.min.js"></script>
-	<script src="/js/translation.js"></script>
-	<script src="/js/popup.js"></script>
+   <script src="/js/translation.js"></script>
+   <script src="/js/popup.js"></script>
 </head>
 
 <body>
 
-	<div class="wrapper">
-		<div class="container">
-			
-			<div class="item">
-				<textarea id="translate-text-in" placeholder="__MSG_translate_in_placeholder__"></textarea>
-				<a href="#" id="btn-textIn-to-speak" class="playVoice"><i class="icon-volume-down"></i></a>
-			</div>
+   <div class="wrapper">
+      <div class="container">
 
-			<div class="item">
-				<select id="fromLang" title="__MSG_translate_choice_source_title__">
-					<option selected value="">__MSG_translate_choice_source__</option>
-				</select>
-
-				<button id="exchangeFromTo" tooltip="__MSG_translate_choice_exchange_title__: Shift+Enter" flow="down"><i class="icon-exchange"></i><!--&lt;-&gt; --></button>
-
-				<select id="toLang" title="__MSG_translate_choice_target_title__">
-					<option selected value="">English</option>
-				</select>
-
-            <button id="bth-translate" title="Ctrl+Enter" flow="right">__MSG_bth_translate__</button>
-            
-				<button tooltip="translate this page in new tab">active tab</button>
-
-				<!-- <button id="buttonSave">save</button>
-					<button id="buttonSaveClear">clear setting</button> -->
-			</div>
-
-			<div class="item">
-				<textarea id="translate-text-out" readonly></textarea>
-				<a href="#" id="btn-textOut-to-speak" class="playVoice"><i class="icon-volume-down"></i></a>
+         <div class="item">
+            <textarea id="original-text" placeholder="__MSG_translate_in_placeholder__"></textarea>
+            <a href="#" id="btn-textIn-to-speak" class="playVoice" title="__MSG_bth_text_to_speak_title__">
+               <i class="icon-volume-down"></i>
+            </a>
          </div>
-         
-         <button id="bth-translate-page" tooltip="translate this page in new tab">translate this page</button>
 
-		</div>
-	</div>
+         <div class="item container">
+            
+            <div class="item">
+               <select id="from-lang" title="__MSG_translate_choice_source_title__">
+                  <option selected value="">__MSG_translate_choice_source__</option>
+               </select>
+
+               <button id="bth-exchange-lang" tooltip="__MSG_translate_choice_exchange_title__: Shift+Enter" flow="down">
+                  <i class="icon-exchange"></i>
+                  <!--&lt;-&gt; -->
+               </button>
+
+               <select id="to-lang" title="__MSG_translate_choice_target_title__">
+                  <option selected value="">English</option>
+               </select>
+            </div>
+            
+            <div class="item">
+               <button id="bth-translate" title="Ctrl+Enter" flow="right">__MSG_bth_translate__</button>
+               
+               <button id="bth-translate-page" tooltip="__MSG_bth_translate_page_title__" flow="left">
+                  <i class="icon-external-link"></i>
+               </button>
+
+               <!-- <button id="buttonSave">save</button>
+               <button id="buttonSaveClear">clear setting</button> -->
+            </div>
+         </div>
+
+         <div class="item">
+            <textarea id="translated-text" class="translated-out" readonly></textarea>
+            <a href="#" id="btn-textOut-to-speak" class="playVoice" title="__MSG_bth_text_to_speak_title__">
+               <i class="icon-volume-down"></i>
+            </a>
+         </div>
+
+      </div>
+   </div>
 
 </body>
+
 </html>

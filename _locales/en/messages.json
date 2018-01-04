@@ -39,12 +39,20 @@
       "description": "selec Lang title",
       "message": "Which language to translate"
    },
+   "translate_context_menu": {
+      "description": "Translate context menu item",
+      "message": "Translate \"%s\""
+   },
    "bth_translate": {
       "description": "Translate button",
       "message": "Translate"
    },
-   "translateContext": {
-      "description": "Translate context menu item",
-      "message": "Translate \"%s\""
+   "bth_translate_page_title": {
+      "description": "translate page title",
+      "message": "Translate this page in new tab"
+   },
+   "bth_text_to_speak_title": {
+      "description": "text to speak title",
+      "message": "Say this text"
    }
 }
