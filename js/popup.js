@@ -18,7 +18,7 @@ window.addEventListener('load', (evt) => {
 
       translate: (dispatch, apiName, callback) => {
          var dispatch = dispatch || {
-            from_language: App.getUI.htmlTag.fromLang.value,
+            from_language: App.getUI.htmlTag.fromLang.value.replace(/~.+$/, ''),
             to_language: App.getUI.htmlTag.toLang.value,
             original_text: App.getUI.htmlTag.textOriginal.value,
          };
@@ -69,8 +69,14 @@ window.addEventListener('load', (evt) => {
          fill: (parameter) => {
             App.getUI.htmlTag.textOriginal.value = App.getUI.htmlTag.textOriginal.value.trim();
             App.getUI.htmlTag.translatedText.value = parameter.translated_text;
-            // App.getUI.setSelectedValue(App.getUI.htmlTag.fromLang, parameter.detectLang);
-            if (App.getUI.htmlTag.fromLang.value == '') {
+
+
+            
+            if (App.getUI.htmlTag.fromLang.value.replace(/~.+$/, '') == '') { //create Auto Detected (rapam)
+               var autoLangCode = parameter.original_text ? '~' + parameter.detectLang : '';
+               // App.getUI.htmlTag.fromLang[0].options[outSelected.options.length] = new Option(parameter.detectLang, '111');
+               // selbox.options[selbox.options.length] = new Option("key","value")).setAttribute("key","value");
+               App.getUI.htmlTag.fromLang[0].value = autoLangCode;
                App.getUI.htmlTag.fromLang[0].innerHTML = chrome.i18n.getMessage("translate_choice_source") + ' (' + App.langlist[parameter.detectLang] + ')';
             }
 
@@ -127,7 +133,7 @@ window.addEventListener('load', (evt) => {
             t.style.height = t.scrollHeight + 'px'
          },
 
-         fillSelected: (outSelected, loadOptionVal) => {
+         fillSelect: (outSelected, loadOptionVal) => {
             for (var i in loadOptionVal) {
                outSelected.options[outSelected.options.length] = new Option(loadOptionVal[i], i);
             }
@@ -165,6 +171,7 @@ window.addEventListener('load', (evt) => {
       getSelectionText: () => {
          try {
             // chrome.tabs.getSelected(null, function(tab){
+            //or
             // chrome.tabs.query({active: true, currentWindow: true}, function(arrayOfTabs) {
             // console.log('tab.id:'+tab.url);
             chrome.tabs.executeScript( /*tab.id,*/ {
@@ -259,12 +266,19 @@ window.addEventListener('load', (evt) => {
                App.getUI.autoExpand(App.getUI.htmlTag.translatedText);
                App.getUI.htmlTag.textOriginal.focus();
                App.getUI.htmlTag.textOriginal.select();
+
+               // restore Auto Detected (rapam)
+               if (res['from-lang'].charAt(0) == '~') {
+                  App.getUI.htmlTag.fromLang[0].value = res['from-lang'];
+                  App.getUI.htmlTag.fromLang[0].innerHTML = chrome.i18n.getMessage("translate_choice_source") + ' (' + App.langlist[res['from-lang'].substr(1)] + ')';
+               }
+
             }), false);
 
-         App.getSelectionText();
+         // App.getSelectionText();
 
-         App.getUI.fillSelected(App.getUI.htmlTag.fromLang, App.langlist);
-         App.getUI.fillSelected(App.getUI.htmlTag.toLang, App.langlist);
+         App.getUI.fillSelect(App.getUI.htmlTag.fromLang, App.langlist);
+         App.getUI.fillSelect(App.getUI.htmlTag.toLang, App.langlist);
 
          if (!App.debug)
             App.analytics();
@@ -319,7 +333,7 @@ window.addEventListener('load', (evt) => {
    App.getUI.htmlTag.textInToSpeak.onclick = function () {
       App.getUI.textToSpeak(this, {
          textToSpeak: App.getUI.htmlTag.textOriginal.value,
-         to_language: App.getUI.htmlTag.fromLang.value,
+         to_language: App.getUI.htmlTag.fromLang.value.replace(/~/, ''), //clear prefix temp lang 
       });
    };
 
