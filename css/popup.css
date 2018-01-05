@@ -37,13 +37,14 @@ textarea {
    box-sizing: border-box;
    /* border-color: rgba(0, 0, 0, 0); */
    resize: vertical;
-   max-height: 250px;
+   max-height: 200px;
    min-height: 30px;
    font-size: 13px;
 }
 
 textarea.translated-out {
    background-color: #f5f5f5;
+   max-height: 250px;
 }
 
 .disabled,
