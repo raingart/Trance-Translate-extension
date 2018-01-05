@@ -98,11 +98,12 @@ window.addEventListener('load', (evt) => {
             }
          },
 
-         setSelectedValue: (e, t) => {
+         setSelectedValue: (e, val) => {
+            // console.log(e+', '+t);
             for (var n = 0; n < e.children.length; n++) {
-               var r = e.children[n];
-               if (r.value === t) {
-                  r.selected = true;
+               var select = e.children[n];
+               if (select.value.replace(/~.+$/, '') === val) {
+                  select.selected = true;
                   break
                }
             }
@@ -115,7 +116,7 @@ window.addEventListener('load', (evt) => {
          exchangeLanguages: () => {
             // var fromLang_temp = App.getSelectedValue(App.getUI.htmlTag.fromLang.value);
             // var toLang_temp = App.getSelectedValue(App.getUI.htmlTag.toLang.value);
-            var fromLang_temp = App.getUI.htmlTag.fromLang.value;
+            var fromLang_temp = App.getUI.htmlTag.fromLang.value.replace(/~.+$/, '');
             var toLang_temp = App.getUI.htmlTag.toLang.value;
 
             App.getUI.setSelectedValue(App.getUI.htmlTag.fromLang, toLang_temp);
@@ -275,7 +276,7 @@ window.addEventListener('load', (evt) => {
 
             }), false);
 
-         // App.getSelectionText();
+         App.getSelectionText();
 
          App.getUI.fillSelect(App.getUI.htmlTag.fromLang, App.langlist);
          App.getUI.fillSelect(App.getUI.htmlTag.toLang, App.langlist);
