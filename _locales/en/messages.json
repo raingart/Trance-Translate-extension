@@ -20,28 +20,28 @@
       "message": "Translate Selected"
    },
    "translate_in_placeholder": {
-      "description": "textarea translate-input placeholder",
+      "description": "textarea original-text placeholder",
       "message": "Text to translate"
    },
-   "translate_choice_source": {
-      "description": "current choice default",
+   "translate_from_language": {
+      "description": "Source language default",
       "message": "Auto detect"
    },
-   "translate_choice_source_title": {
-      "description": "selec Lang title",
+   "translate_from_language_title": {
+      "description": "Source language title",
       "message": "From which language translate"
    },
    "translate_choice_exchange_title": {
       "description": "Exchange title",
       "message": "Exchange places language"
    },
-   "translate_choice_target_title": {
-      "description": "selec Lang title",
+   "translate_to_language_title": {
+      "description": "Target language title",
       "message": "Which language to translate"
    },
    "translate_context_menu": {
-      "description": "Translate context menu item",
-      "message": "Translate \"%s\""
+      "description": "Translate context menu item \"%s\"",
+      "message": "Trance Translate \"%s\""
    },
    "bth_translate": {
       "description": "Translate button",
@@ -54,5 +54,9 @@
    "bth_text_to_speak_title": {
       "description": "text to speak title",
       "message": "Say this text"
+   },
+   "msg_not_access_tab": {
+      "description": "try translate page chrome:// URL",
+      "message": "Cannot access in isolated tab (chrome:// URL)\nTry use selected text, right-click and context menu"
    }
 }

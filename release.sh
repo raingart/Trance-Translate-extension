@@ -13,8 +13,8 @@ zip -r $FILENAME.zip \
                   icons/128.png \
                   js/*.js \
                   lib/*.min.js \
-                  html/popup.html \
-                  css/tooltip/*.css \
+                  html/*.html \
+                  css/*/*.css \
                   css/*.css \
                   manifest.json \
                   # html/*.html \

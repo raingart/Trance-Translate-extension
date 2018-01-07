@@ -1,8 +1,8 @@
 body {
    min-width: 450px;
    color: #000000;
-   /* font-size: 0.3em; */
-   margin: 8px;
+   padding: 10px;
+   /* font-size: 1em; */
 }
 
 a {
@@ -19,7 +19,7 @@ a {
 .container>.container {
    flex-direction: row;
    justify-content: space-between;
-   margin: 8px 0;
+   padding: 10px 0;
 }
 
 div.item {
@@ -37,7 +37,7 @@ textarea {
    box-sizing: border-box;
    /* border-color: rgba(0, 0, 0, 0); */
    resize: vertical;
-   max-height: 200px;
+   max-height: 150px;
    min-height: 30px;
    font-size: 13px;
 }

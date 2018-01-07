@@ -14,7 +14,8 @@
    <script src="/lib/localization.min.js"></script>
    <script src="/lib/storage.min.js"></script>
 
-   <script src="/js/translation.js"></script>
+   <script src="/js/http.js"></script>
+   <script src="/js/google_ts.js"></script>
    <script src="/js/popup.js"></script>
 </head>
 
@@ -24,8 +25,8 @@
       <div class="container">
 
          <div class="item">
-            <textarea id="original-text" placeholder="__MSG_translate_in_placeholder__"></textarea>
-            <a href="#" id="btn-textIn-to-speak" class="playVoice" title="__MSG_bth_text_to_speak_title__">
+            <textarea id="text-original" placeholder="__MSG_translate_in_placeholder__"></textarea>
+            <a href="#" id="btn-text-to-speak-in" class="playVoice" title="__MSG_bth_text_to_speak_title__">
                <i class="icon-volume-down"></i>
             </a>
          </div>
@@ -33,16 +34,16 @@
          <div class="item container">
             
             <div class="item">
-               <select id="from-lang" title="__MSG_translate_choice_source_title__">
-                  <option selected value="">__MSG_translate_choice_source__</option>
+               <select id="lang-from" title="__MSG_translate_from_language_title__">
+                  <option selected value="">__MSG_translate_from_language__</option>
                </select>
 
-               <button id="bth-exchange-lang" tooltip="__MSG_translate_choice_exchange_title__: Shift+Enter" flow="down">
+               <button id="bth-lang-exchange" tooltip="__MSG_translate_choice_exchange_title__: Shift+Enter" flow="down">
                   <i class="icon-exchange"></i>
                   <!--&lt;-&gt; -->
                </button>
 
-               <select id="to-lang" title="__MSG_translate_choice_target_title__">
+               <select id="lang-to" title="__MSG_translate_to_language_title__">
                   <option selected value="">English</option>
                </select>
             </div>
@@ -60,8 +61,8 @@
          </div>
 
          <div class="item">
-            <textarea id="translated-text" class="translated-out" readonly></textarea>
-            <a href="#" id="btn-textOut-to-speak" class="playVoice" title="__MSG_bth_text_to_speak_title__">
+            <textarea id="text-translated" class="translated-out" readonly></textarea>
+            <a href="#" id="btn-text-to-speak-out" class="playVoice" title="__MSG_bth_text_to_speak_title__">
                <i class="icon-volume-down"></i>
             </a>
          </div>
