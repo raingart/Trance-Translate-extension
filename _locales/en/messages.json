@@ -48,15 +48,43 @@
       "message": "Translate"
    },
    "bth_translate_page_title": {
-      "description": "translate page title",
+      "description": "Translate page title",
       "message": "Translate this page in new tab"
    },
+   "bth_open_settings_title": {
+      "description": "Open settings tab",
+      "message": "Open settings tab"
+   },
    "bth_text_to_speak_title": {
-      "description": "text to speak title",
+      "description": "speak-text button title",
       "message": "Say this text"
    },
    "msg_not_access_tab": {
-      "description": "try translate page chrome:// URL",
+      "description": "Try translate page chrome:// URL",
       "message": "Cannot access in isolated tab (chrome:// URL)\nTry use selected text, right-click and context menu"
+   },
+   "opt_keySendEnter": {
+      "description": "option keySendEnter param",
+      "message": "Translate = \"Crtl+Enter\""
+   },
+   "opt_keySendEnter_tooltip": {
+      "description": "option keySendEnter title",
+      "message": "Default: OFF"
+   },
+   "opt_keySendEnter_desc": {
+      "description": "option keySendEnter description",
+      "message": "Translate when keys are pressed \"Ctrl+Enter\""
+   },
+   "opt_bth_save_settings": {
+      "description": "option save settings",
+      "message": "Save Changes"
+   },
+   "opt_bth_save_settings_processed": {
+      "description": "option save button settings is processed",
+      "message": "Saved"
+   },
+   "opt_bth_save_settings_tooltip": {
+      "description": "option save button settings title",
+      "message": "do not affect the open popup extension"
    }
 }

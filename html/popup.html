@@ -9,6 +9,8 @@
    <link rel="stylesheet" href="/css/tooltip/tooltip.min.css" />
    <link rel="stylesheet" href="/css/tooltip/tooltip-animation.min.css" />
    <link rel="stylesheet" href="/css/font-awesome.min.css" />
+
+   <link rel="stylesheet" href="/css/global.css" />
    <link rel="stylesheet" href="/css/popup.css" />
 
    <script src="/lib/localization.min.js"></script>
@@ -32,7 +34,7 @@
          </div>
 
          <div class="item container">
-            
+
             <div class="item">
                <select id="lang-from" title="__MSG_translate_from_language_title__">
                   <option selected value="">__MSG_translate_from_language__</option>
@@ -47,16 +49,17 @@
                   <option selected value="">English</option>
                </select>
             </div>
-            
+
             <div class="item">
-               <button id="bth-translate" title="Ctrl+Enter" flow="right">__MSG_bth_translate__</button>
-               
+               <button id="bth-translate" title="Enter">__MSG_bth_translate__</button>
+
                <button id="bth-translate-page" tooltip="__MSG_bth_translate_page_title__" flow="left">
                   <i class="icon-external-link"></i>
                </button>
-
-               <!-- <button id="buttonSave">save</button>
-               <button id="buttonSaveClear">clear setting</button> -->
+               
+               <button id="bth-open-settings" tooltip="__MSG_bth_open_settings_title__" flow="left">
+                  <i class="icon-gear"></i>
+               </button>
             </div>
          </div>
 
@@ -69,7 +72,8 @@
 
       </div>
    </div>
+   
+   <iframe frameborder="0" class="hide"></iframe>
 
 </body>
-
 </html>

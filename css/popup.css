@@ -1,19 +1,8 @@
-body {
-   min-width: 450px;
-   color: #000000;
-   padding: 10px;
-   /* font-size: 1em; */
-}
-
-a {
-   color: #3d3d3d;
-   /* text-decoration: none; */
-}
+/* body {
+} */
 
 .container {
-   display: flex;
-   flex-direction: column;
-   flex-wrap: wrap;
+   padding: 10px;
 }
 
 .container>.container {
@@ -22,21 +11,8 @@ a {
    padding: 10px 0;
 }
 
-div.item {
-   position: relative;
-}
-
-input,
-select {
-   font-size: 1.1em;
-}
-
 textarea {
-   display: block;
-   width: 100%;
-   box-sizing: border-box;
    /* border-color: rgba(0, 0, 0, 0); */
-   resize: vertical;
    max-height: 150px;
    min-height: 30px;
    font-size: 13px;
@@ -45,13 +21,6 @@ textarea {
 textarea.translated-out {
    background-color: #f5f5f5;
    max-height: 250px;
-}
-
-.disabled,
-.disabled[disabled] {
-   opacity: .4;
-   cursor: default !important;
-   pointer-events: none;
 }
 
 .playVoice {
