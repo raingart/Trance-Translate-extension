@@ -37,7 +37,7 @@ window.addEventListener('load', (evt) => {
       translate: (dispatch, callback) => {
          App.getUI.textOriginal.value = App.getUI.textOriginal.value.trim();
          var dispatch = dispatch || {
-            from_language: App.getUI.translatedFrom.value.replace(/~.+$/, ''),
+            from_language: App.getUI.translatedFrom.value.replace(/~.+$/, ''), //clear prefix temp lang 
             to_language: App.getUI.translatedTo.value,
             original_text: App.getUI.textOriginal.value,
          };
@@ -58,7 +58,7 @@ window.addEventListener('load', (evt) => {
          chrome.tabs.query({
             active: true,
             lastFocusedWindow: true
-         }, function (tabs) {
+         }, (tabs) => {
             var tab = tabs[0];
             if (App.validURL(tab.url)) {
                App.translate_source.toPage({
@@ -133,9 +133,10 @@ window.addEventListener('load', (evt) => {
          App.setSelectedLang(App.getUI.translatedFrom, translatedTo_temp);
          App.setSelectedLang(App.getUI.translatedTo, translatedFrom_temp);
 
+          //exchange text in textarea
          var a = App.getUI.textOriginal;
          var b = App.getUI.textTranslated;
-         if (a.value == '') { //exchange text in textarea
+         if (a.value == '') {
             b.value = [a.value, a.value = b.value][0];
          }
       },
@@ -162,7 +163,7 @@ window.addEventListener('load', (evt) => {
          ico.classList.toggle("icon-volume-down");
          ico.classList.add("icon-volume-up");
 
-         App.translate_source.toSpeak(args, function (outAudio) {
+         App.translate_source.toSpeak(args, (outAudio) => {
             outAudio.start(0);
             setTimeout(() => {
                ico.classList.toggle("icon-volume-down");
@@ -181,7 +182,7 @@ window.addEventListener('load', (evt) => {
             chrome.tabs.executeScript( /*tab.id,*/ {
                code: "window.getSelection().toString();",
                allFrames: true
-            }, function (selection) {
+            }, (selection) => {
                if (selection && selection[0]) {
                   App.log('getSelectionText:', JSON.stringify(selection));
                   App.getUI.textOriginal.value = selection[0];
@@ -203,9 +204,8 @@ window.addEventListener('load', (evt) => {
          if (!regex.test(str)) {
             console.log("Not valid URL", str);
             return false;
-         } else {
+         } else
             return true;
-         }
       },
 
       localStorage: {
@@ -277,15 +277,14 @@ window.addEventListener('load', (evt) => {
          App.bildOptionTag(App.getUI.translatedFrom, App.translate_source.langlist);
          App.bildOptionTag(App.getUI.translatedTo, App.translate_source.langlist);
 
-         App.counter_keySendEnter = App.makeCounter();
+         App.temp_counter_keySendEnter = App.makeCounter();
 
          if (!App.debug)
             App.analytics();
       },
 
       log: (msg, arg1) => {
-         if (App.debug)
-            console.log('>> ' + msg.toString(), arg1 || '')
+         if (App.debug) console.log('[+] ' + msg.toString(), arg1 || '')
       },
 
       makeCounter: () => {
@@ -326,40 +325,38 @@ window.addEventListener('load', (evt) => {
 
       } else if (e.ctrlKey && e.which == 13) { //ctrl+Enter
          // App.log('>ctrl+Enter');
-         if (keySendEnter) {
-            App.translate();
-         } else {
-            App.getUI.textOriginal.value += '\n';
-            // App.textareaAutoHeight(App.getUI.textOriginal);
-         }
+         if (keySendEnter) App.translate();
+         else App.getUI.textOriginal.value += '\n';
 
       } else if (e.which == 13 && !keySendEnter) { //Enter
          // App.log('>Enter');
-         if (App.counter_keySendEnter() === 3) App.helpHint(false, App.tempSaveStorage.keySendEnter ? 1 : 2);
+         if (App.temp_counter_keySendEnter() === 3) {
+            App.helpHint(false, App.tempSaveStorage.keySendEnter ? 1 : 2);
+         }
          App.getUI.textOriginal.value = App.getUI.textOriginal.value.trim();
-         // App.textareaAutoHeight(App.getUI.textOriginal);
          App.translate();
       } else { //Other key
-         App.counter_keySendEnter = App.makeCounter();
+         App.temp_counter_keySendEnter = App.makeCounter();
       }
       App.textareaAutoHeight(App.getUI.textOriginal);
       return false;
    });
    // };
 
-   App.getUI.textToSpeakIn.onclick = function () {
+   // App.getUI.textToSpeakIn.onclick = function () {
+   App.getUI.textToSpeakIn.addEventListener("click", function () {
       App.speakPlay(this, {
          textToSpeak: App.getUI.textOriginal.value,
          to_language: App.getUI.translatedFrom.value.replace(/~/, ''), //clear prefix temp lang 
       });
-   };
+   });
 
-   App.getUI.textToSpeakOut.onclick = function () {
+   App.getUI.textToSpeakOut.addEventListener("click", function () {
       App.speakPlay(this, {
          textToSpeak: App.getUI.textTranslated.value,
          to_language: App.getUI.translatedTo.value,
       });
-   };
+   });
 
    App.getUI.textOriginal.addEventListener("input", function () {
       App.textareaAutoHeight(this);
@@ -375,12 +372,9 @@ window.addEventListener('load', (evt) => {
       iframeId.classList.toggle("hide");
       if (iframeId.src == '') {
          iframeId.src = '/html/settings.html';
+         iframeId.onload = resizeIframe(this);
       }
 
-      iframeId.onload = function () {
-         App.log('iframeId loaded');
-         resizeIframe(this)
-      };
       function resizeIframe(obj) {
          obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
       }

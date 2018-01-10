@@ -7,6 +7,8 @@ const GoogleTS_API = {
       /* beautify preserve:start */af:"Afrikaans",sq:"Albanian",am:"Amharic",ar:"العربية",hy:"Armenian",az:"Azeerbaijani",eu:"Basque",be:"Belarusian",bn:"Bengali",bs:"Bosnian",bg:"Bulgarian",ca:"Catalan",ceb:"Cebuano","zh-CN":"Chinese","zh-TW":"中國傳統",co:"Corsican",hr:"Croatian",cs:"Czech",da:"Danish",nl:"Dutch",en:"English",eo:"Esperanto",et:"Estonian",fi:"Finnish",fr:"French",fy:"Frisian",gl:"Galician",ka:"Georgian",de:"German",el:"Greek",gu:"Gujarati",ht:"Haitian Creole",ha:"Hausa",haw:"Hawaiian",iw:"Hebrew",hi:"Hindi",hmn:"Hmong",hu:"Hungarian",is:"Icelandic",ig:"Igbo",id:"Indonesian",ga:"Irish",it:"Italian",ja:"Japanese",jw:"Javanese",kn:"Kannada",kk:"Kazakh",km:"Khmer",ko:"Korean",ku:"Kurdish",ky:"Kyrgyz",lo:"Lao",la:"Latin",lv:"Latvian",lt:"Lithuanian",lb:"Luxembourgish",mk:"Macedonian",mg:"Malagasy",ms:"Malay",ml:"Malayalam",mt:"Maltese",mi:"Maori",mr:"Marathi",mn:"Mongolian",my:"Myanmar",ne:"Nepali",no:"Norwegian",ny:"Nyanja",ps:"Pashto",fa:"Persian",pl:"Polish",pt:"Portuguese",pa:"Punjabi",ro:"Romanian",ru:"Russian",sm:"Samoan",gd:"Scots Gaelic",sr:"Serbian",st:"Sesotho",sn:"Shona",sd:"Sindhi",si:"Sinhala",sk:"Slovak",sl:"Slovenian",so:"Somali",es:"Spanish",su:"Sundanese",sw:"Swahili",sv:"Swedish",tl:"Tagalog",tg:"Tajik",ta:"Tamil",te:"Telugu",th:"Thai",tr:"Turkish",uk:"Ukrainian",ur:"Urdu",uz:"Uzbek",vi:"Vietnamese",cy:"Welsh",xh:"Xhosa",yi:"Yiddish",yo:"Yoruba",zu:"Zulu"/* beautify preserve:end */
    },
 
+   googleHost: 'https://translate.google.com/',
+
    openUrl: (url, isActiveTab) => {
       chrome.tabs.create({
          url: url,
@@ -16,7 +18,7 @@ const GoogleTS_API = {
 
    toWeb: (args) => {
       GoogleTS_API.log('translate toWeb:', args.url);
-      var url = "https://translate.google.com/#" +
+      var url = GoogleTS_API.googleHost + "#" +
          args.from_language + "|" +
          args.to_language + "|" +
          encodeURIComponent(args.original_text.trim());
@@ -27,7 +29,7 @@ const GoogleTS_API = {
 
    toPage: (args) => {
       GoogleTS_API.log('translate toPage:', args.url);
-      var url = 'https://translate.google.com/translate?' +
+      var url = GoogleTS_API.googleHost + 'translate?' +
          '&sl=' + 'auto' +
          "&tl=" + args.to_language +
          "&u=" + args.url;
@@ -49,7 +51,7 @@ const GoogleTS_API = {
             GoogleTS_API.log(textToSpeak);
          }
 
-         let soundUrl = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob' +
+         let soundUrl = GoogleTS_API.googleHost + '/translate_tts?ie=UTF-8&client=tw-ob' +
             '&tl=' + to +
             '&q=' + textToSpeak;
          // GoogleTS_API.log('url:', url);
@@ -123,18 +125,17 @@ const GoogleTS_API = {
          'original_text': res[0][0][1],
          'translated_text': function () {
             let p = '';
-            for (let i in res[0]) { //res[0][0][0]
+            for (let i in res[0]) {
                p += res[0][i][0];
                // GoogleTS_API.log('translatedText: ' + p);
             }
             return p;
-         }(), //res[0][0][0],
+         }(),,
          'detectLang': res[2]
       }
    },
 
    log: (msg, arg1) => {
-      if (GoogleTS_API.debug)
-         console.log('>> ' + msg.toString(), arg1 || '')
+      if (GoogleTS_API.debug) console.log('>> ' + msg.toString(), arg1 || '')
    }
 };

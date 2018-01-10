@@ -31,10 +31,9 @@ window.addEventListener('load', (evt) => {
          var callback = (res) => Storage.restoreOptions(res);
          Storage.getParams(null, callback, false /*local*/ );
       },
-      
+
       log: (msg, arg1) => {
-         if (App.debug)
-            console.log('>> ' + msg.toString(), arg1 || '')
+         if (App.debug) console.log('[+] ' + msg.toString(), arg1 || '')
       }
    }
 
