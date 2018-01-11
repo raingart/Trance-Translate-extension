@@ -63,6 +63,8 @@ var Core = {
    },
 };
 
+Core.init();
+
 // Register the event handlers.
 chrome.contextMenus.onClicked.addListener(function (clickData, tab) {
    // console.log('clickData.menuItemId:', clickData.menuItemId);
@@ -73,6 +75,20 @@ chrome.contextMenus.onClicked.addListener(function (clickData, tab) {
    //    alert('clickData.menuItemId:\n'+ clickData.menuItemId)
    // }
 });
+
+var manifest = chrome.runtime.getManifest();
+var uninstallUrl =  "https://docs.google.com/forms/d/e/1FAIpQLSdgDabLtk8vapLTEXKoXucHVXLrDujBrXZg418mGrLE0zND2g/viewform?usp=pp_url&entry.1936476946&entry.1337380930&entry.1757501795=";
+uninstallUrl += encodeURIComponent(manifest.short_name + ' (v' +manifest.version + ')');
+
+chrome.runtime.setUninstallURL(uninstallUrl, function(details) {
+   var lastError = chrome.runtime.lastError;
+   if (lastError && lastError.message) {
+       console.warn("Unable to set uninstall URL: " + lastError.message);
+   } else {
+       // The url is set
+   }
+});
+
 
 // when install or update new version fired
 // chrome.runtime.onInstalled && chrome.runtime.onInstalled.addListener(function(detail) {
@@ -89,5 +105,3 @@ chrome.contextMenus.onClicked.addListener(function (clickData, tab) {
 //    console.log(`Have a new version:${detail.version}`);
 //    chrome.runtime.reload(); // install new version soon
 // });
-
-Core.init();

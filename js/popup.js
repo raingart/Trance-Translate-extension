@@ -14,18 +14,18 @@ window.addEventListener('load', (evt) => {
       },
 
       getUI: {
-            translatedFrom: document.getElementById('lang-from'),
-            translatedTo: document.getElementById('lang-to'),
-            textOriginal: document.getElementById('text-original') ||
-               document.querySelectorAll('textarea')[0],
-            textTranslated: document.getElementById('text-translated') ||
-               document.querySelectorAll('textarea')[1],
-            exchangeLang: document.getElementById('bth-lang-exchange'),
-            textToSpeakIn: document.getElementById('btn-text-to-speak-in'),
-            textToSpeakOut: document.getElementById('btn-text-to-speak-out'),
-            bthTranslate: document.getElementById('bth-translate'),
-            bthTranslatePage: document.getElementById('bth-translate-page'),
-            bthOpenSettings: document.getElementById('bth-open-settings'),
+         translatedFrom: document.getElementById('lang-from'),
+         translatedTo: document.getElementById('lang-to'),
+         textOriginal: document.getElementById('text-original') ||
+            document.querySelectorAll('textarea')[0],
+         textTranslated: document.getElementById('text-translated') ||
+            document.querySelectorAll('textarea')[1],
+         exchangeLang: document.getElementById('bth-lang-exchange'),
+         textToSpeakIn: document.getElementById('btn-text-to-speak-in'),
+         textToSpeakOut: document.getElementById('btn-text-to-speak-out'),
+         bthTranslate: document.getElementById('bth-translate'),
+         bthTranslatePage: document.getElementById('bth-translate-page'),
+         bthOpenSettings: document.getElementById('bth-open-settings'),
       },
 
       analytics: () => {
