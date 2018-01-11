@@ -123,14 +123,14 @@ const GoogleTS_API = {
       GoogleTS_API.log('resirve: ' + JSON.stringify(res));
       return {
          'original_text': res[0][0][1],
-         'translated_text': function () {
+         'translated_text': (() => {
             let p = '';
             for (let i in res[0]) {
                p += res[0][i][0];
                // GoogleTS_API.log('translatedText: ' + p);
             }
             return p;
-         }(),,
+         })(),
          'detectLang': res[2]
       }
    },

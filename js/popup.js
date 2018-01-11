@@ -14,18 +14,18 @@ window.addEventListener('load', (evt) => {
       },
 
       getUI: {
-         translatedFrom: document.getElementById('lang-from'),
-         translatedTo: document.getElementById('lang-to'),
-         textOriginal: document.getElementById('text-original') ||
-            document.querySelectorAll('textarea')[0],
-         textTranslated: document.getElementById('text-translated') ||
-            document.querySelectorAll('textarea')[1],
-         exchangeLang: document.getElementById('bth-lang-exchange'),
-         textToSpeakIn: document.getElementById('btn-text-to-speak-in'),
-         textToSpeakOut: document.getElementById('btn-text-to-speak-out'),
-         bthTranslate: document.getElementById('bth-translate'),
-         bthTranslatePage: document.getElementById('bth-translate-page'),
-         bthOpenSettings: document.getElementById('bth-open-settings'),
+            translatedFrom: document.getElementById('lang-from'),
+            translatedTo: document.getElementById('lang-to'),
+            textOriginal: document.getElementById('text-original') ||
+               document.querySelectorAll('textarea')[0],
+            textTranslated: document.getElementById('text-translated') ||
+               document.querySelectorAll('textarea')[1],
+            exchangeLang: document.getElementById('bth-lang-exchange'),
+            textToSpeakIn: document.getElementById('btn-text-to-speak-in'),
+            textToSpeakOut: document.getElementById('btn-text-to-speak-out'),
+            bthTranslate: document.getElementById('bth-translate'),
+            bthTranslatePage: document.getElementById('bth-translate-page'),
+            bthOpenSettings: document.getElementById('bth-open-settings'),
       },
 
       analytics: () => {
@@ -133,7 +133,7 @@ window.addEventListener('load', (evt) => {
          App.setSelectedLang(App.getUI.translatedFrom, translatedTo_temp);
          App.setSelectedLang(App.getUI.translatedTo, translatedFrom_temp);
 
-          //exchange text in textarea
+         //exchange text in textarea
          var a = App.getUI.textOriginal;
          var b = App.getUI.textTranslated;
          if (a.value == '') {
@@ -314,7 +314,7 @@ window.addEventListener('load', (evt) => {
    // Register the event handlers.
 
    // document.onkeyup = (e) => {
-   document.addEventListener("keyup", function (e) { //eventPage
+   document.addEventListener("keyup", async(e) => { //eventPage
       var keySendEnter = App.tempSaveStorage.keySendEnter || null;
       // App.log('keySendEnter:', keySendEnter);
 
@@ -343,7 +343,7 @@ window.addEventListener('load', (evt) => {
    });
    // };
 
-   // App.getUI.textToSpeakIn.onclick = function () {
+   // App.getUI.textToSpeakIn.onclick = async(event) => {
    App.getUI.textToSpeakIn.addEventListener("click", function () {
       App.speakPlay(this, {
          textToSpeak: App.getUI.textOriginal.value,
@@ -378,7 +378,6 @@ window.addEventListener('load', (evt) => {
       function resizeIframe(obj) {
          obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
       }
-
    });
 
 });
