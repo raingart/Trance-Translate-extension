@@ -5,7 +5,7 @@
    "description": "__MSG_app_description__",
    "update_url": "https://clients2.google.com/service/update2/crx",
    "default_locale": "en",
-   "version": "0.4.1",
+   "version": "0.4.3",
    "author": "raingart",
    "permissions": [
       "activeTab",
@@ -19,7 +19,7 @@
       "page": "/html/background.html",
       "persistent": true
    },
-   "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; default-src 'self'",
+   "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self';",
    "options_page": "html/settings.html",
    "options_ui": {
       "chrome_style": false,

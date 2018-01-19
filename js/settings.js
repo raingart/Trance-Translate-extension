@@ -13,7 +13,8 @@ window.addEventListener('load', (evt) => {
       // Saves options to localStorage/chromeSync.
       saveOptions: function (k) {
          var optionsSave = {};
-         optionsSave['keySendEnter'] = App.getUI.keySendEnter.checked ? true : false;
+         // optionsSave['keySendEnter'] = App.getUI.keySendEnter.checked ? true : false;
+         optionsSave['keySendEnter'] = App.getUI.keySendEnter.value;
          Storage.setParams(optionsSave, false /*local*/ );
 
          // k.innerHTML = chrome.i18n.getMessage("opt_bth_save_process");
@@ -25,6 +26,7 @@ window.addEventListener('load', (evt) => {
             // k.classList.toggle("in-progress");
             // k.classList.remove("disabled");
          }, 1500);
+         chrome.runtime.reload();
       },
 
       init: function () {

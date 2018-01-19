@@ -4,7 +4,7 @@ console.log(chrome.i18n.getMessage("app_name") + ": init popup.js");
 window.addEventListener('load', (evt) => {
 
    const App = {
-      debug: true,
+      // debug: true,
 
       translate_source: {
          langlist: GoogleTS_API.langlist,
@@ -24,7 +24,6 @@ window.addEventListener('load', (evt) => {
          textToSpeakIn: document.getElementById('btn-text-to-speak-in'),
          textToSpeakOut: document.getElementById('btn-text-to-speak-out'),
          bthTranslate: document.getElementById('bth-translate'),
-         bthTranslatePage: document.getElementById('bth-translate-page'),
          bthOpenSettings: document.getElementById('bth-open-settings'),
       },
 
@@ -52,22 +51,6 @@ window.addEventListener('load', (evt) => {
             App.showLoading(true);
             App.translate_source.toText(dispatch, callback);
          }
-      },
-
-      translatePage: () => {
-         chrome.tabs.query({
-            active: true,
-            lastFocusedWindow: true
-         }, (tabs) => {
-            var tab = tabs[0];
-            if (App.validURL(tab.url)) {
-               App.translate_source.toPage({
-                  to_language: App.getUI.translatedTo.value,
-                  url: tab.url
-               });
-            } else
-               alert(chrome.i18n.getMessage("msg_not_access_tab"));
-         });
       },
 
       fillReturn: (parameter) => {
@@ -199,15 +182,6 @@ window.addEventListener('load', (evt) => {
          }
       },
 
-      validURL: (str) => {
-         var regex = /(http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
-         if (!regex.test(str)) {
-            console.log("Not valid URL", str);
-            return false;
-         } else
-            return true;
-      },
-
       localStorage: {
          // Saves options to localStorage/chromeSync.
          update: (reset) => {
@@ -234,9 +208,8 @@ window.addEventListener('load', (evt) => {
                App.getUI.textOriginal.focus();
                App.getUI.textOriginal.select();
 
-               App['tempSaveStorage'] = res;
-               if (App.tempSaveStorage.keySendEnter)
-                  App.getUI.bthTranslate.setAttribute("title", "Ctrl+Enter");
+               App.tempSaveStorage = res;
+               App.getUI.bthTranslate.setAttribute("title", res.keySendEnter || 'Enter');
 
                // restore Auto Detected (rapam) in load
                if (res['lang-from'] && res['lang-from'].charAt(0) == '~') {
@@ -312,36 +285,38 @@ window.addEventListener('load', (evt) => {
    //   }, false);
 
    // Register the event handlers.
+   App.getUI.textOriginal.addEventListener("keydown", async(e) => {
+      var gKeyStore = [];
 
-   // document.onkeyup = (e) => {
-   document.addEventListener("keyup", async(e) => { //eventPage
-      var keySendEnter = App.tempSaveStorage.keySendEnter || null;
-      // App.log('keySendEnter:', keySendEnter);
-
-      if (e.shiftKey && e.which == 13) { //shift+Enter
-         // App.log('>shift+Enter');
-         App.getUI.textOriginal.value = App.getUI.textOriginal.value.trim();
-         App.exchangeLanguages();
-
-      } else if (e.ctrlKey && e.which == 13) { //ctrl+Enter
-         // App.log('>ctrl+Enter');
-         if (keySendEnter) App.translate();
-         else App.getUI.textOriginal.value += '\n';
-
-      } else if (e.which == 13 && !keySendEnter) { //Enter
-         // App.log('>Enter');
-         if (App.temp_counter_keySendEnter() === 3) {
-            App.helpHint(false, App.tempSaveStorage.keySendEnter ? 1 : 2);
-         }
-         App.getUI.textOriginal.value = App.getUI.textOriginal.value.trim();
-         App.translate();
-      } else { //Other key
-         App.temp_counter_keySendEnter = App.makeCounter();
+      if (e.ctrlKey && e.which == 13) { //ctrl
+         gKeyStore.push('ctrl')
+         gKeyStore.push('enter');
+      } else if (e.shiftKey && e.which == 13) { //shift
+         gKeyStore.push('shift')
+         gKeyStore.push('enter');
+      } else if (e.which == 13) { //enter
+         gKeyStore.push('enter');
+      } else {
+         gKeyStore = []
       }
-      App.textareaAutoHeight(App.getUI.textOriginal);
-      return false;
+      // gKeyStore.push(String.fromCharCode(e.keyCode));
+
+      var keySendEnter = App.tempSaveStorage.keySendEnter ? 
+         App.tempSaveStorage.keySendEnter.toLowerCase() : 'enter';
+      var gKeyStoreCodeList = gKeyStore.join("-").toString().toLowerCase();
+      App.log('gKeyStore ' + gKeyStoreCodeList);
+
+      // key is press
+      if (gKeyStoreCodeList == keySendEnter) {
+         App.log('hit: ' + keySendEnter + '(setting)==' + gKeyStoreCodeList+'(now)');
+         App.translate()
+         e.preventDefault(); //prevent default behavior
+      }
    });
-   // };
+
+   App.getUI.textOriginal.addEventListener("input", function () {
+      App.textareaAutoHeight(this);
+   });
 
    // App.getUI.textToSpeakIn.onclick = async(event) => {
    App.getUI.textToSpeakIn.addEventListener("click", function () {
@@ -358,14 +333,12 @@ window.addEventListener('load', (evt) => {
       });
    });
 
-   App.getUI.textOriginal.addEventListener("input", function () {
-      App.textareaAutoHeight(this);
-   });
+
    App.getUI.exchangeLang.addEventListener("click", App.exchangeLanguages, false);
+
    App.getUI.bthTranslate.addEventListener("click", function () {
-      App.translate()
+      App.translate();
    });
-   App.getUI.bthTranslatePage.addEventListener("click", App.translatePage, false);
 
    App.getUI.bthOpenSettings.addEventListener("click", function () {
       var iframeId = document.querySelectorAll('iframe')[0];

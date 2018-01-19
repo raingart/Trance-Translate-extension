@@ -1,47 +1,78 @@
 console.log(chrome.i18n.getMessage("app_name") + ": init background.js");
 
 var Core = {
-      createContextMenu: function (menuItemId) {
-         chrome.contextMenus.create({
-            id: menuItemId || 'test',
-            title: chrome.i18n.getMessage("translate_context_menu"),
-            contexts: ["selection"]
-         });
-      },
+   // createContextMenu: function (menuItemId) {
+   //    chrome.contextMenus.create({
+   //       id: menuItemId || 'test',
+   //       title: chrome.i18n.getMessage("translate_context_menu"),
+   //       contexts: ["selection"]
+   //    });
+   // },
 
-      notify: function (title, msg, icon) {
-         var manifest = chrome.runtime.getManifest();
-         chrome.notifications.create('info', {
-            type: 'basic',
-            iconUrl: icon || manifest.icons['48'], //48,128
-            title: title || chrome.i18n.getMessage("app_name"),
-            // "priority": 2,
-            message: msg || ''
-         }, function (notificationId) {
-            chrome.notifications.onClicked.addListener(function (callback) {
-               chrome.notifications.clear(notificationId);
-               // chrome.notifications.clear(notificationId, callback);
+   translate_source: {
+      toText: GoogleTS_API.toTranslate,
+      toPage: GoogleTS_API.toPage,
+      toWeb: GoogleTS_API.toSpeak
+   },
+
+   notify: function (title, msg, icon) {
+      var manifest = chrome.runtime.getManifest();
+      chrome.notifications.create('info', {
+         type: 'basic',
+         iconUrl: icon || manifest.icons['48'], //48,128
+         title: title || chrome.i18n.getMessage("app_name"),
+         // "priority": 2,
+         message: msg || ''
+      }, function (notificationId) {
+         chrome.notifications.onClicked.addListener(function (callback) {
+            chrome.notifications.clear(notificationId);
+            // chrome.notifications.clear(notificationId, callback);
+         });
+      });
+   },
+
+   validURL: (str) => {
+      var regex = /(http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
+      if (!regex.test(str)) {
+         console.log("Not valid URL", str);
+         return false;
+      } else
+         return true;
+   },
+
+   translatePage: () => {
+      chrome.tabs.query({
+         active: true,
+         lastFocusedWindow: true
+      }, (tabs) => {
+         var tab = tabs[0];
+         if (Core.validURL(tab.url)) {
+            Core.translate_source.toPage({
+               to_language: Core.conf.toLang,
+               url: tab.url
             });
-         });
-      },
+         } else
+            alert(chrome.i18n.getMessage("msg_not_access_tab"));
+      });
+   },
 
-      translate: function (textToTranslate) {
-         var textToTranslate = textToTranslate.trim();
-         var dispatch = {
-            from_language: Core.conf.fromLang,
-            to_language: Core.conf.toLang,
-            original_text: textToTranslate,
+   translate: function (textToTranslate) {
+      var textToTranslate = textToTranslate.trim();
+      var dispatch = {
+         from_language: Core.conf.fromLang,
+         to_language: Core.conf.toLang,
+         original_text: textToTranslate,
+      };
+
+      if (textToTranslate.length > 200) { //max notifyCallback symbols 
+         Core.translate_source.toWeb(dispatch);
+      } else {
+         var notifyCallback = function (params) {
+            Core.notify(chrome.i18n.getMessage("app_short_name") +
+               ' [' + /*params.detectLang*/ Core.conf.fromLang + ' > ' + Core.conf.toLang + ']',
+               params.translated_text);
          };
-
-         if (textToTranslate.length > 200) { //max notifyCallback symbols 
-            GoogleTS_API.toWeb(dispatch);
-         } else {
-            var notifyCallback = function (params) {
-               Core.notify(chrome.i18n.getMessage("app_short_name") +
-                  ' [' + /*params.detectLang*/ Core.conf.fromLang + ' > ' + Core.conf.toLang + ']',
-                  params.translated_text);
-            };
-         GoogleTS_API.toTranslate(dispatch, notifyCallback);
+         Core.translate_source.toText(dispatch, notifyCallback);
       }
    },
 
@@ -57,7 +88,19 @@ var Core = {
 
       var callback = function (res) {
          Core.loadDefaultSettings(res);
-         Core.createContextMenu('selection-translate-google');
+         // Core.createContextMenu('selection-translate-google');
+
+         chrome.contextMenus.create({
+            id: 'translate-selection',
+            title: chrome.i18n.getMessage("context_menu_selection"),
+            contexts: ["selection"]
+         });
+         chrome.contextMenus.create({
+            id: 'translate-page',
+            title: chrome.i18n.getMessage("context_menu_page"), 
+            // onclick: getword,
+         });
+
       };
       Storage.getParams(null, callback, false);
    },
@@ -68,40 +111,30 @@ Core.init();
 // Register the event handlers.
 chrome.contextMenus.onClicked.addListener(function (clickData, tab) {
    // console.log('clickData.menuItemId:', clickData.menuItemId);
-   if (clickData.menuItemId == "selection-translate-google") {
-      Core.translate(clickData.selectionText);
+   switch (clickData.menuItemId) {
+      case 'translate-selection':
+         Core.translate(clickData.selectionText);
+         break;
+      case 'translate-page':
+         Core.translatePage();
+         break;
+      // case 'test':
+      //    alert('clickData.menuItemId:\n' + clickData.menuItemId)
+      //    break;
+         // default:
+         //   console.log('Sorry, we are out of ' + expr + '.');
    }
-   // else if (clickData.menuItemId == "test") {
-   //    alert('clickData.menuItemId:\n'+ clickData.menuItemId)
-   // }
 });
 
 var manifest = chrome.runtime.getManifest();
-var uninstallUrl =  "https://docs.google.com/forms/d/e/1FAIpQLSdgDabLtk8vapLTEXKoXucHVXLrDujBrXZg418mGrLE0zND2g/viewform?usp=pp_url&entry.1936476946&entry.1337380930&entry.1757501795=";
-uninstallUrl += encodeURIComponent(manifest.short_name + ' (v' +manifest.version + ')');
+var uninstallUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdgDabLtk8vapLTEXKoXucHVXLrDujBrXZg418mGrLE0zND2g/viewform?usp=pp_url&entry.1936476946&entry.1337380930&entry.1757501795=";
+uninstallUrl += encodeURIComponent(manifest.short_name + ' (v' + manifest.version + ')');
 
-chrome.runtime.setUninstallURL(uninstallUrl, function(details) {
+chrome.runtime.setUninstallURL(uninstallUrl, function (details) {
    var lastError = chrome.runtime.lastError;
    if (lastError && lastError.message) {
-       console.warn("Unable to set uninstall URL: " + lastError.message);
+      console.warn("Unable to set uninstall URL: " + lastError.message);
    } else {
-       // The url is set
+      // The url is set
    }
 });
-
-
-// when install or update new version fired
-// chrome.runtime.onInstalled && chrome.runtime.onInstalled.addListener(function(detail) {
-//    if (detail.reason === 'update') {
-//  if(parseInt(detail.previousVersion.replace(/\./g, '')) < 213) { // (v2.1.3)
-//      chrome.storage.local.clear();
-//      alert('app updated');
-//  }
-//    }
-// });
-
-// when update available
-// chrome.runtime.onUpdateAvailable && chrome.runtime.onUpdateAvailable.addListener(function(detail) {
-//    console.log(`Have a new version:${detail.version}`);
-//    chrome.runtime.reload(); // install new version soon
-// });

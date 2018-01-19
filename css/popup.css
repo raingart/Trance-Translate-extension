@@ -8,14 +8,13 @@
 .container>.container {
    flex-direction: row;
    justify-content: space-between;
-   padding: 10px 0;
+   padding: 8px 0;
 }
 
 textarea {
    /* border-color: rgba(0, 0, 0, 0); */
    max-height: 150px;
    min-height: 30px;
-   font-size: 13px;
 }
 
 textarea.translated-out {
@@ -42,12 +41,11 @@ textarea.translated-out {
 }
 
 .playVoice:hover {
-   outline: 1px solid #cacaca;
+   color: #000;
 }
 
 .playVoice:active {
-   background: rgb(0, 162, 255);
-   color: #ffffff;
+   outline: 1px solid #cacaca;
 }
 
 .playVoice>* {

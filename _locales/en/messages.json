@@ -19,6 +19,7 @@
       "description": "Extension's title",
       "message": "Translate Selected"
    },
+
    "translate_in_placeholder": {
       "description": "textarea original-text placeholder",
       "message": "Text to translate"
@@ -39,10 +40,16 @@
       "description": "Target language title",
       "message": "Which language to translate"
    },
-   "translate_context_menu": {
-      "description": "Translate context menu item \"%s\"",
+
+   "context_menu_selection": {
+      "description": "Translate context menu item selection",
       "message": "Trance Translate \"%s\""
    },
+   "context_menu_page": {
+      "description": "Translate context menu item page",
+      "message": "Trance Translate this Page"
+   },
+
    "bth_translate": {
       "description": "Translate button",
       "message": "Translate"
@@ -53,27 +60,29 @@
    },
    "bth_open_settings_title": {
       "description": "Open settings tab",
-      "message": "Open settings tab"
+      "message": "Open settings"
    },
    "bth_text_to_speak_title": {
       "description": "speak-text button title",
       "message": "Say this text"
    },
+
    "msg_not_access_tab": {
-      "description": "Try translate page chrome:// URL",
+      "description": "Try translate page chrome://URL",
       "message": "Cannot access in isolated tab (chrome:// URL)\nTry use selected text, right-click and context menu"
    },
+
    "opt_keySendEnter": {
       "description": "option keySendEnter param",
-      "message": "Translate = \"Crtl+Enter\""
+      "message": "Hotkey send translate text"
    },
    "opt_keySendEnter_tooltip": {
       "description": "option keySendEnter title",
-      "message": "Default: OFF"
+      "message": "Default: Enter"
    },
    "opt_keySendEnter_desc": {
       "description": "option keySendEnter description",
-      "message": "Translate when keys are pressed \"Ctrl+Enter\""
+      "message": "The alternative to the new line is \"Shift-Enter\""
    },
    "opt_bth_save_settings": {
       "description": "option save settings",
@@ -85,6 +94,6 @@
    },
    "opt_bth_save_settings_tooltip": {
       "description": "option save button settings title",
-      "message": "do not affect the open popup extension"
+      "message": "the extension will restart"
    }
 }

@@ -25,12 +25,15 @@
       <div class="container">
 
          <div class="item containerL">
-            <div class="item">
-               <input type="checkbox" id="keySendEnter" />
+            <div class="item" tooltip="__MSG_opt_keySendEnter_tooltip__" flow="right">
+               <select id="keySendEnter" title="__MSG_translate_from_language_title__">
+                  <option selected value="enter">Enter</option>
+                  <option value="ctrl-enter">Ctrl+Enter</option>
+               </select>
             </div>
             <div class="item containerR">
                <label for="keySendEnter">__MSG_opt_keySendEnter__
-                  <span tooltip="__MSG_opt_keySendEnter_tooltip__" flow="right">__MSG_opt_keySendEnter_desc__</span>
+                  <span>__MSG_opt_keySendEnter_desc__</span>
                </label>
             </div>
          </div>
