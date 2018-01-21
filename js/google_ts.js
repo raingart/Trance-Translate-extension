@@ -89,7 +89,7 @@ const GoogleTS_API = {
       }
    },
 
-   toTranslate: (request, callback) => {
+   toText: (request, callback) => {
       GoogleTS_API.log('google translate input:\n', JSON.stringify(request));
 
       if (request && request.original_text) {

@@ -10,9 +10,9 @@ var Core = {
    // },
 
    translate_source: {
-      toText: GoogleTS_API.toTranslate,
+      toText: GoogleTS_API.toText,
       toPage: GoogleTS_API.toPage,
-      toWeb: GoogleTS_API.toSpeak
+      toWeb: GoogleTS_API.toWeb
    },
 
    notify: function (title, msg, icon) {
@@ -56,15 +56,16 @@ var Core = {
       });
    },
 
-   translate: function (textToTranslate) {
-      var textToTranslate = textToTranslate.trim();
+   translateSelection: function (text) {
+      var text = text.trim();
+      
       var dispatch = {
          from_language: Core.conf.fromLang,
          to_language: Core.conf.toLang,
-         original_text: textToTranslate,
+         original_text: text,
       };
 
-      if (textToTranslate.length > 200) { //max notifyCallback symbols 
+      if (text.length > 200) { //max notifyCallback symbols 
          Core.translate_source.toWeb(dispatch);
       } else {
          var notifyCallback = function (params) {
@@ -113,7 +114,7 @@ chrome.contextMenus.onClicked.addListener(function (clickData, tab) {
    // console.log('clickData.menuItemId:', clickData.menuItemId);
    switch (clickData.menuItemId) {
       case 'translate-selection':
-         Core.translate(clickData.selectionText);
+         Core.translateSelection(clickData.selectionText);
          break;
       case 'translate-page':
          Core.translatePage();

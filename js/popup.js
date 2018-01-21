@@ -4,11 +4,11 @@ console.log(chrome.i18n.getMessage("app_name") + ": init popup.js");
 window.addEventListener('load', (evt) => {
 
    const App = {
-      // debug: true,
+      debug: true,
 
       translate_source: {
          langlist: GoogleTS_API.langlist,
-         toText: GoogleTS_API.toTranslate,
+         toText: GoogleTS_API.toText,
          toPage: GoogleTS_API.toPage,
          toSpeak: GoogleTS_API.toSpeak
       },
@@ -33,8 +33,16 @@ window.addEventListener('load', (evt) => {
          document.getElementsByTagName("head")[0].appendChild(x);
       },
 
-      translate: (dispatch, callback) => {
+      clearText: () => {
          App.getUI.textOriginal.value = App.getUI.textOriginal.value.trim();
+         App.textareaAutoHeight(App.getUI.textOriginal);
+         App.textareaAutoHeight(App.getUI.textTranslated);
+      },
+
+      translate: (dispatch, callback) => {
+         App.clearText();
+         App.exchangeText();
+
          var dispatch = dispatch || {
             from_language: App.getUI.translatedFrom.value.replace(/~.+$/, ''), //clear prefix temp lang 
             to_language: App.getUI.translatedTo.value,
@@ -45,8 +53,25 @@ window.addEventListener('load', (evt) => {
             var callback = callback || ((parameter) => {
                App.log('resirve:', JSON.stringify(parameter));
                App.showLoading(false);
-               App.fillReturn(parameter);
-               App.localStorage.update();
+
+               // if translated To == From invert lang
+               // set new callback
+               if (parameter.detectLang == dispatch.to_language && 
+               dispatch.from_language != dispatch.to_language) {
+                  // App.setSelectedLang(App.getUI.translatedTo, App.getUI.translatedFrom.value);
+                  App.exchangeLanguages();
+                  var callback = ((parameter) => {
+                     App.log('resirve:', JSON.stringify(parameter));
+                     App.showLoading(false);
+                     App.fillReturn(parameter);
+                     App.localStorage.update();
+                     App.exchangeLanguages();
+                  });
+                  App.translate(false, callback);
+               } else {
+                  App.fillReturn(parameter);
+                  App.localStorage.update();
+               }
             });
             App.showLoading(true);
             App.translate_source.toText(dispatch, callback);
@@ -54,16 +79,15 @@ window.addEventListener('load', (evt) => {
       },
 
       fillReturn: (parameter) => {
+         App.getUI.textTranslated.value = parameter.translated_text;
+         
          if (App.getUI.translatedFrom.value.replace(/~.+$/, '') == '') { //create Auto Detected (rapam)
             App.getUI.translatedFrom[0].value = '~' + parameter.detectLang;
             App.getUI.translatedFrom[0].innerHTML = chrome.i18n.getMessage("translate_from_language") +
                ' (' + App.translate_source.langlist[parameter.detectLang] + ')';
          }
 
-         App.getUI.textTranslated.value = parameter.translated_text;
-         // App.getUI.textOriginal.value = App.getUI.textOriginal.value.trim();
-         App.textareaAutoHeight(App.getUI.textOriginal);
-         App.textareaAutoHeight(App.getUI.textTranslated);
+         App.clearText();
          App.getUI.textOriginal.focus();
       },
 
@@ -78,24 +102,14 @@ window.addEventListener('load', (evt) => {
             clearInterval(App.temploadingMessage);
       },
 
-      helpHint: (outEl, typeN) => {
-         var type1 = '';
-         var type2 = '';
-         if (typeN === 1) type1 = 'Ctrl+'
-         else if (typeN === 2) type2 = 'Ctrl+'
-
-         var el = outEl || document.createElement('div');
-         el.className = 'item helpHint';
-         el.innerHTML = '<span><i>"' + type1 + 'Enter"</i> - translate</span> | ';
-         el.innerHTML += '<span><i>"' + type2 + 'Enter"</i> - newline</span>';
-         document.getElementsByClassName('container')[0].appendChild(el);
-      },
-
       setSelectedLang: (selectObj, val) => {
          for (var n = 0; n < selectObj.children.length; n++) {
             var option = selectObj.children[n];
             if (option.value.charAt(0) == '~') { // clear "~LangCode"
                option.value = '';
+            }
+            if (val.charAt(0) == '~') { // clear "~LangCode"
+               val = '';
             }
             if (option.value === val) {
                option.selected = true;
@@ -115,8 +129,12 @@ window.addEventListener('load', (evt) => {
          var translatedTo_temp = App.getUI.translatedTo.value;
          App.setSelectedLang(App.getUI.translatedFrom, translatedTo_temp);
          App.setSelectedLang(App.getUI.translatedTo, translatedFrom_temp);
+         
+         App.exchangeText();
+      },
 
-         //exchange text in textarea
+      //exchange text in textarea
+      exchangeText: () => {
          var a = App.getUI.textOriginal;
          var b = App.getUI.textTranslated;
          if (a.value == '') {
@@ -169,7 +187,6 @@ window.addEventListener('load', (evt) => {
                if (selection && selection[0]) {
                   App.log('getSelectionText:', JSON.stringify(selection));
                   App.getUI.textOriginal.value = selection[0];
-                  App.textareaAutoHeight(App.getUI.textOriginal);
                   App.translate();
                }
             });
@@ -194,7 +211,7 @@ window.addEventListener('load', (evt) => {
             var optionsSave = {};
             optionsSave['lang-from'] = App.getUI.translatedFrom.value;
             optionsSave['lang-to'] = App.getUI.translatedTo.value;
-            optionsSave['text-original'] = App.getUI.textOriginal.value;
+            optionsSave['text-original'] = App.getUI.textOriginal.value.trim();
             optionsSave['text-translated'] = App.getUI.textTranslated.value;
 
             Storage.setParams(optionsSave, false /*local*/ );
@@ -203,8 +220,8 @@ window.addEventListener('load', (evt) => {
          load: () => {
             var callback = ((res) => {
                Storage.restoreOptions(res)
-               App.textareaAutoHeight(App.getUI.textOriginal);
-               App.textareaAutoHeight(App.getUI.textTranslated);
+
+               App.clearText();
                App.getUI.textOriginal.focus();
                App.getUI.textOriginal.select();
 
@@ -345,8 +362,12 @@ window.addEventListener('load', (evt) => {
       iframeId.classList.toggle("hide");
       if (iframeId.src == '') {
          iframeId.src = '/html/settings.html';
-         iframeId.onload = resizeIframe(this);
       }
+
+      iframeId.addEventListener('load', function () {
+         resizeIframe(this);
+         // this.style.height = this.contentWindow.document.body.scrollHeight + 'px';
+      })
 
       function resizeIframe(obj) {
          obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
