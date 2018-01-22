@@ -35,8 +35,8 @@ window.addEventListener('load', (evt) => {
 
       clearText: () => {
          App.getUI.textOriginal.value = App.getUI.textOriginal.value.trim();
-         App.textareaAutoHeight(App.getUI.textOriginal);
-         App.textareaAutoHeight(App.getUI.textTranslated);
+         App.autoHeightTag(App.getUI.textOriginal);
+         App.autoHeightTag(App.getUI.textTranslated);
       },
 
       translate: (dispatch, callback) => {
@@ -56,9 +56,9 @@ window.addEventListener('load', (evt) => {
 
                // if translated To == From invert lang
                // set new callback
-               if (parameter.detectLang == dispatch.to_language && 
-               dispatch.from_language != dispatch.to_language) {
-                  // App.setSelectedLang(App.getUI.translatedTo, App.getUI.translatedFrom.value);
+               if (parameter.detectLang == dispatch.to_language &&
+                  dispatch.from_language != dispatch.to_language) {
+                  // App.setSelected(App.getUI.translatedTo, App.getUI.translatedFrom.value);
                   App.exchangeLanguages();
                   var callback = ((parameter) => {
                      App.log('resirve:', JSON.stringify(parameter));
@@ -80,7 +80,7 @@ window.addEventListener('load', (evt) => {
 
       fillReturn: (parameter) => {
          App.getUI.textTranslated.value = parameter.translated_text;
-         
+
          if (App.getUI.translatedFrom.value.replace(/~.+$/, '') == '') { //create Auto Detected (rapam)
             App.getUI.translatedFrom[0].value = '~' + parameter.detectLang;
             App.getUI.translatedFrom[0].innerHTML = chrome.i18n.getMessage("translate_from_language") +
@@ -102,15 +102,14 @@ window.addEventListener('load', (evt) => {
             clearInterval(App.temploadingMessage);
       },
 
-      setSelectedLang: (selectObj, val) => {
+      setSelected: (selectObj, val) => {
          for (var n = 0; n < selectObj.children.length; n++) {
             var option = selectObj.children[n];
-            if (option.value.charAt(0) == '~') { // clear "~LangCode"
-               option.value = '';
-            }
-            if (val.charAt(0) == '~') { // clear "~LangCode"
-               val = '';
-            }
+            // start fix for LangCode
+            // clear "~LangCode"
+            if (option.value.charAt(0) == '~') option.value = '';
+            if (val.charAt(0) == '~') val = '';
+            // fix end
             if (option.value === val) {
                option.selected = true;
                break
@@ -127,9 +126,9 @@ window.addEventListener('load', (evt) => {
          // var translatedTo_temp = App.getSelectedValue(App.getUI.translatedTo.value);
          var translatedFrom_temp = App.getUI.translatedFrom.value.replace(/~.+$/, '');
          var translatedTo_temp = App.getUI.translatedTo.value;
-         App.setSelectedLang(App.getUI.translatedFrom, translatedTo_temp);
-         App.setSelectedLang(App.getUI.translatedTo, translatedFrom_temp);
-         
+         App.setSelected(App.getUI.translatedFrom, translatedTo_temp);
+         App.setSelected(App.getUI.translatedTo, translatedFrom_temp);
+
          App.exchangeText();
       },
 
@@ -142,9 +141,18 @@ window.addEventListener('load', (evt) => {
          }
       },
 
-      textareaAutoHeight: (t) => {
-         t.style.height = 'inherit';
-         t.style.height = t.scrollHeight + 3 + 'px';
+      autoHeightTag: (obj) => {
+         switch (obj.tagName.toLowerCase()) {
+            case 'textarea':
+               obj.style.height = 'inherit';
+               obj.style.height = obj.scrollHeight + 3 + 'px';
+               break;
+            case 'iframe':
+               obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+               break;
+            default:
+               obj.style.height = 'auto';
+         }
       },
 
       bildOptionTag: (selbox, optionVal) => {
@@ -181,12 +189,15 @@ window.addEventListener('load', (evt) => {
             // chrome.tabs.query({active: true, currentWindow: true}, function(arrayOfTabs) {
             // console.log('tab.id:'+tab.url);
             chrome.tabs.executeScript( /*tab.id,*/ {
-               code: "window.getSelection().toString();",
+               code: "window.getSelection().toString()",
                allFrames: true
             }, (selection) => {
-               if (selection && selection[0]) {
-                  App.log('getSelectionText:', JSON.stringify(selection));
-                  App.getUI.textOriginal.value = selection[0];
+               // get all frames
+               var selected = selection.filter((x) => {
+                  return (x !== (undefined || null || ''));
+               });
+               if (selected) {
+                  App.getUI.textOriginal.value = selected;
                   App.translate();
                }
             });
@@ -267,8 +278,6 @@ window.addEventListener('load', (evt) => {
          App.bildOptionTag(App.getUI.translatedFrom, App.translate_source.langlist);
          App.bildOptionTag(App.getUI.translatedTo, App.translate_source.langlist);
 
-         App.temp_counter_keySendEnter = App.makeCounter();
-
          if (!App.debug)
             App.analytics();
       },
@@ -276,13 +285,6 @@ window.addEventListener('load', (evt) => {
       log: (msg, arg1) => {
          if (App.debug) console.log('[+] ' + msg.toString(), arg1 || '')
       },
-
-      makeCounter: () => {
-         var currentCount = 1;
-         return () => {
-            return currentCount++;
-         };
-      }
 
       // langlist: lang.map(code => code.substr(0, 2).toLowerCase()),
       // return x<y ? -1 : x>y ? 1 : 0;
@@ -318,21 +320,21 @@ window.addEventListener('load', (evt) => {
       }
       // gKeyStore.push(String.fromCharCode(e.keyCode));
 
-      var keySendEnter = App.tempSaveStorage.keySendEnter ? 
+      var keySendEnter = App.tempSaveStorage.keySendEnter ?
          App.tempSaveStorage.keySendEnter.toLowerCase() : 'enter';
       var gKeyStoreCodeList = gKeyStore.join("-").toString().toLowerCase();
       App.log('gKeyStore ' + gKeyStoreCodeList);
 
       // key is press
       if (gKeyStoreCodeList == keySendEnter) {
-         App.log('hit: ' + keySendEnter + '(setting)==' + gKeyStoreCodeList+'(now)');
+         App.log('hit: ' + keySendEnter + '(setting)==' + gKeyStoreCodeList + '(now)');
          App.translate()
          e.preventDefault(); //prevent default behavior
       }
    });
 
    App.getUI.textOriginal.addEventListener("input", function () {
-      App.textareaAutoHeight(this);
+      App.autoHeightTag(this);
    });
 
    // App.getUI.textToSpeakIn.onclick = async(event) => {
@@ -360,18 +362,12 @@ window.addEventListener('load', (evt) => {
    App.getUI.bthOpenSettings.addEventListener("click", function () {
       var iframeId = document.querySelectorAll('iframe')[0];
       iframeId.classList.toggle("hide");
-      if (iframeId.src == '') {
+      if (iframeId.src === '')
          iframeId.src = '/html/settings.html';
-      }
 
       iframeId.addEventListener('load', function () {
-         resizeIframe(this);
-         // this.style.height = this.contentWindow.document.body.scrollHeight + 'px';
+         App.autoHeightTag(this);
       })
-
-      function resizeIframe(obj) {
-         obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
-      }
    });
 
 });
