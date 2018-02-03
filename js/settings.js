@@ -7,14 +7,14 @@ window.addEventListener('load', (evt) => {
 
       getUI: {
          bthSave: document.getElementById('bth-save-settings'),
-         keySendEnter: document.getElementById('keySendEnter'),
+         hotkeySend: document.getElementById('hotkeySend'),
       },
 
       // Saves options to localStorage/chromeSync.
       saveOptions: function (k) {
          var optionsSave = {};
-         // optionsSave['keySendEnter'] = App.getUI.keySendEnter.checked ? true : false;
-         optionsSave['keySendEnter'] = App.getUI.keySendEnter.value;
+         // optionsSave['hotkeySend'] = App.getUI.hotkeySend.checked ? true : false;
+         optionsSave['hotkeySend'] = App.getUI.hotkeySend.value;
          Storage.setParams(optionsSave, false /*local*/ );
 
          // k.innerHTML = chrome.i18n.getMessage("opt_bth_save_process");
@@ -35,13 +35,23 @@ window.addEventListener('load', (evt) => {
       },
 
       log: (msg, arg1) => {
-         if (App.debug) console.log('[+] ' + msg.toString(), arg1 || '')
-      }
+         var arg1 = arg1 === undefined ? '' : arg1;
+         if (App.debug) console.log('[+] ' + msg.toString().trim(), arg1)
+      },
    }
 
    App.init();
 
    App.getUI.bthSave.addEventListener("click", function () {
       App.saveOptions(this)
+   });
+
+   document.getElementById('donate').addEventListener("click", function (e) {
+      const manifest = chrome.runtime.getManifest();
+      var payment = '1DbKD1rQXobztpsqx2dPZeMz1nKyRJCm9b';
+      // if (window.prompt("BTC payment:", payment))
+      var url = 'https://blockchain.info/payment_request?address=' + payment;
+      url += '&message=' + encodeURIComponent(manifest.short_name) + '+project';
+      var win = window.open(url, '_blank');
    });
 });

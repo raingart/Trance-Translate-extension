@@ -1,6 +1,8 @@
 console.log(chrome.i18n.getMessage("app_name") + ": init google_ts.js");
 
-const GoogleTS_API = {
+const translateAPI = {};
+
+translateAPI.Google = {
    // debug: true,
 
    langlist: {
@@ -17,29 +19,29 @@ const GoogleTS_API = {
    },
 
    toWeb: (args) => {
-      GoogleTS_API.log('translate toWeb:', args.url);
-      var url = GoogleTS_API.googleHost + "#" +
+      translateAPI.Google.log('translate toWeb:', args.url);
+      let url = translateAPI.Google.googleHost + "#" +
          args.from_language + "|" +
          args.to_language + "|" +
          encodeURIComponent(args.original_text.trim());
 
-      GoogleTS_API.openUrl(url)
+      translateAPI.Google.openUrl(url)
       // prompt("toWeb", url); 
    },
 
-   toPage: (args) => {
-      GoogleTS_API.log('translate toPage:', args.url);
-      var url = GoogleTS_API.googleHost + 'translate?' +
+   toUrl: (args) => {
+      translateAPI.Google.log('translate toUrl:', args.url);
+      let url = translateAPI.Google.googleHost + 'translate?' +
          '&sl=' + 'auto' +
          "&tl=" + args.to_language +
          "&u=" + args.url;
 
-      GoogleTS_API.openUrl(url)
+      translateAPI.Google.openUrl(url)
       // prompt("toWeb", url); 
    },
 
    toSpeak: (request, callback) => {
-      GoogleTS_API.log('Start Speaking!:\n', JSON.stringify(request));
+      translateAPI.Google.log('Start Speaking!:\n', JSON.stringify(request));
 
       if (request && request.textToSpeak) {
          let textToSpeak = request.textToSpeak.trim();
@@ -48,13 +50,13 @@ const GoogleTS_API = {
          textToSpeak = textToSpeak.replace(/%20| /g, '+');
          if (textToSpeak.substr(0, 1) == ' ' || textToSpeak.substr(0, 1) == '+') {
             textToSpeak = textToSpeak.substr(1, textToSpeak.length - 1);
-            GoogleTS_API.log(textToSpeak);
+            translateAPI.Google.log(textToSpeak);
          }
 
-         let soundUrl = GoogleTS_API.googleHost + '/translate_tts?ie=UTF-8&client=tw-ob' +
+         let soundUrl = translateAPI.Google.googleHost + '/translate_tts?ie=UTF-8&client=tw-ob' +
             '&tl=' + to +
             '&q=' + textToSpeak;
-         // GoogleTS_API.log('url:', url);
+         // translateAPI.Google.log('url:', url);
 
          let type = request.type || 'arrayBuffer';
          let payload = request.payload || {};
@@ -90,7 +92,7 @@ const GoogleTS_API = {
    },
 
    toText: (request, callback) => {
-      GoogleTS_API.log('google translate input:\n', JSON.stringify(request));
+      translateAPI.Google.log('google translate input:\n', JSON.stringify(request));
 
       if (request && request.original_text) {
          let from = request.from_language || 'auto';
@@ -100,13 +102,15 @@ const GoogleTS_API = {
          let type = request.type || 'json';
          let payload = request.payload || {};
 
-         let url = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t" +
+         let url = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&dt=bd" +
+         // let url = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t" +
+         // hl:	EXT_LOCALE,   
             '&sl=' + from +
             "&tl=" + to +
             "&q=" + encodeURIComponent(q);
 
          let _callback = ((res) => {
-            let translatedOut = GoogleTS_API.clearResonse(res);
+            let translatedOut = translateAPI.Google.clearResonse(res);
             if (callback && typeof (callback) === "function") {
                return callback(translatedOut);
             }
@@ -120,22 +124,40 @@ const GoogleTS_API = {
    },
 
    clearResonse: (res) => {
-      GoogleTS_API.log('resirve: ' + JSON.stringify(res));
+      translateAPI.Google.log('resirve: ' + JSON.stringify(res));
       return {
          'original_text': res[0][0][1],
+
          'translated_text': (() => {
-            let p = '';
-            for (let i in res[0]) {
-               p += res[0][i][0];
-               // GoogleTS_API.log('translatedText: ' + p);
+            let out = [];
+            // translated
+            var sentences = res[0];
+            for (let i in sentences)
+               out.push( sentences[i][0] );
+
+            out.push( "" );
+
+            // dictionary
+				if (res[1] && res[1].length) {
+               let dict = res[1];
+               for (let i in dict) {
+						out.push( dict[i][0] + ":" );
+
+						for (let j=0; j<dict[i][1].length; j++)
+                     out.push( (j+1) + ". " + dict[i][1][j] );
+
+						// out.push( "" );
+					}
             }
-            return p;
+            // collect result
+            return out.join('\n')
          })(),
-         'detectLang': res[2]
+         
+         'detectLang': res[2],
       }
    },
 
    log: (msg, arg1) => {
-      if (GoogleTS_API.debug) console.log('>> ' + msg.toString(), arg1 || '')
+      if (translateAPI.Google.debug) console.log('>> ' + msg.toString(), arg1 || '')
    }
 };

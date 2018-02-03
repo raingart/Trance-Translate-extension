@@ -9,10 +9,10 @@ var Core = {
    //    });
    // },
 
-   translate_source: {
-      toText: GoogleTS_API.toText,
-      toPage: GoogleTS_API.toPage,
-      toWeb: GoogleTS_API.toWeb
+   translateProvider: {
+      toText: translateAPI['Google'].toText,
+      toUrl: translateAPI['Google'].toUrl,
+      toWeb: translateAPI['Google'].toWeb
    },
 
    notify: function (title, msg, icon) {
@@ -46,19 +46,28 @@ var Core = {
          lastFocusedWindow: true
       }, (tabs) => {
          var tab = tabs[0];
-         if (Core.validURL(tab.url)) {
-            Core.translate_source.toPage({
+         if (this.validURL(tab.url)) {
+            Core.translateProvider.toUrl({
                to_language: Core.conf.toLang,
                url: tab.url
             });
          } else
             alert(chrome.i18n.getMessage("msg_not_access_tab"));
       });
+
+      function validURL(str) {
+         var regex = /(http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
+         if (!regex.test(str)) {
+            console.log("Not valid URL", str);
+            return false;
+         } else
+            return true;
+      }
    },
 
    translateSelection: function (text) {
       var text = text.trim();
-      
+
       var dispatch = {
          from_language: Core.conf.fromLang,
          to_language: Core.conf.toLang,
@@ -66,14 +75,14 @@ var Core = {
       };
 
       if (text.length > 200) { //max notifyCallback symbols 
-         Core.translate_source.toWeb(dispatch);
+         Core.translateProvider.toWeb(dispatch);
       } else {
          var notifyCallback = function (params) {
             Core.notify(chrome.i18n.getMessage("app_short_name") +
                ' [' + /*params.detectLang*/ Core.conf.fromLang + ' > ' + Core.conf.toLang + ']',
                params.translated_text);
          };
-         Core.translate_source.toText(dispatch, notifyCallback);
+         Core.translateProvider.toText(dispatch, notifyCallback);
       }
    },
 
@@ -82,6 +91,15 @@ var Core = {
       Core.conf.fromLang = res['lang-from'] && res['lang-from'].charAt(0) == '~' ? "auto" : res['lang-from'];
       Core.conf.toLang = res['lang-to'] || "en";
       console.log('loadDefaultSettings', JSON.stringify(Core.conf));
+   },
+
+   selectionIndicator: function () {
+      //    var selected = window.getSelection().toString();
+      //    // var icon = selected.length > 0 ? '' : manifest.icons['16'];
+      //    var icon = selected.length > 0 ? 'y' : 'n';
+
+      //    // chrome.browserAction.setIcon({ path: icon });
+      //    chrome.browserAction.setBadgeText({ text: icon });
    },
 
    init: function () {
@@ -98,12 +116,16 @@ var Core = {
          });
          chrome.contextMenus.create({
             id: 'translate-page',
-            title: chrome.i18n.getMessage("context_menu_page"), 
+            title: chrome.i18n.getMessage("context_menu_page"),
             // onclick: getword,
          });
 
       };
       Storage.getParams(null, callback, false);
+
+      // Core.timerSelection = setTimeout(function () {
+      //    Core.selectionIndicator();
+      // }, 100);
    },
 };
 
@@ -119,9 +141,9 @@ chrome.contextMenus.onClicked.addListener(function (clickData, tab) {
       case 'translate-page':
          Core.translatePage();
          break;
-      // case 'test':
-      //    alert('clickData.menuItemId:\n' + clickData.menuItemId)
-      //    break;
+         // case 'test':
+         //    alert('clickData.menuItemId:\n' + clickData.menuItemId)
+         //    break;
          // default:
          //   console.log('Sorry, we are out of ' + expr + '.');
    }

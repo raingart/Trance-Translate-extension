@@ -72,21 +72,26 @@
       "message": "Cannot access in isolated tab (chrome:// URL)\nTry use selected text, right-click and context menu"
    },
 
-   "opt_keySendEnter": {
-      "description": "option keySendEnter param",
+   "opt_hotkey_send": {
+      "description": "option hotkeySend param",
       "message": "Hotkey send translate text"
    },
-   "opt_keySendEnter_tooltip": {
-      "description": "option keySendEnter title",
+   "opt_hotkey_send_tooltip": {
+      "description": "option hotkeySend title",
       "message": "Default: Enter"
    },
-   "opt_keySendEnter_desc": {
-      "description": "option keySendEnter description",
-      "message": "The alternative to the new line is \"Shift-Enter\""
+   "opt_hotkey_send_desc": {
+      "description": "option hotkeySend description",
+      "message": "The alternative to the new line is <q>Shift+Enter</q>"
    },
+   
    "opt_bth_save_settings": {
       "description": "option save settings",
       "message": "Save Changes"
+   },
+   "opt_bth_save_settings_process": {
+      "description": "option save button settings is processed",
+      "message": "Saving..."
    },
    "opt_bth_save_settings_processed": {
       "description": "option save button settings is processed",
@@ -95,5 +100,14 @@
    "opt_bth_save_settings_tooltip": {
       "description": "option save button settings title",
       "message": "the extension will restart"
+   },
+
+   "donate_tooltip": {
+      "description": "donate link title",
+      "message": "Help the project"
+   },
+   "donate": {
+      "description": "donate link",
+      "message": "Donate"
    }
 }

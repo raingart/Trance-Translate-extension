@@ -5,25 +5,24 @@
    "description": "__MSG_app_description__",
    "update_url": "https://clients2.google.com/service/update2/crx",
    "default_locale": "en",
-   "version": "0.4.5",
+   "version": "0.5.0",
    "author": "raingart",
    "permissions": [
       "activeTab",
       "tabs",
       "storage",
       "contextMenus",
-      "notifications",
-      "https://translate.google.com/*"
+      "notifications"
    ],
    "background": {
       "page": "/html/background.html",
       "persistent": true
    },
    "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self';",
-   "options_page": "html/settings.html",
+   "options_page": "/html/settings.html",
    "options_ui": {
       "chrome_style": false,
-      "page": "html/settings.html"
+      "page": "/html/settings.html"
    },
    "browser_action": {
       "default_icon": {

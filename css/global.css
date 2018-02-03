@@ -1,0 +1,63 @@
+body {
+   font-size: 13px;
+   font-family: Raleway, HelveticaNeue, "Helvetica Neue", Helvetica, Arial, sans-serif;
+   color: #222;
+}
+
+a {
+   color: deepskyblue;
+   /* text-decoration: none; */
+}
+
+.container {
+   display: flex;
+   flex-direction: column;
+   flex-wrap: wrap;
+}
+
+div.item {
+   position: relative;
+}
+
+.disabled,
+[disabled] {
+   /* opacity: .5; */
+   cursor: default !important;
+   pointer-events: none;
+}
+
+input,
+select,
+textarea {
+   font-size: 13px;
+   margin: 0;
+}
+
+label,
+legend,
+textarea,
+iframe {
+   display: block;
+   width: 100%;
+   box-sizing: border-box;
+}
+
+legend {
+   cursor: default;
+}
+
+hr {
+   border-width: 0;
+   width: 100%;
+   margin: 10px auto;
+   border-top: 1px solid #B7B7B7;
+}
+
+label,
+legend {
+   font-weight: normal;
+}
+
+.hide {
+   display: none !important;
+}

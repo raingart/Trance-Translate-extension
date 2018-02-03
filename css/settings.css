@@ -1,0 +1,76 @@
+body {
+   margin: 0 auto;
+   font-size: 13px;
+   min-width: 450px;
+   line-height: 1.4;
+}
+
+hr {
+   margin: 5px auto 8px;
+}
+
+.container {
+   padding: 0 10px 10px;
+}
+
+.container>div.item {
+   padding: 8px 0;
+}
+
+.container>div.item:not(:last-child) {
+   border-top: 1px solid #e0e0e0;
+   border-bottom: 1px solid #e0e0e0;
+}
+
+.containerL>div.item:first-child {
+   margin: 0 5px;
+   border-top: 0 !important;
+}
+
+label {
+   cursor: pointer;
+}
+
+label>span {
+   display: block;
+   color: grey;
+   font-size: 12px;
+}
+
+label>span>q {
+   font-style: italic;
+   color: #006b9e;
+   quotes: "\00ab" "\00bb";
+}
+
+.containerL {
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+}
+
+.containerR {
+   display: flex;
+   flex-direction: column;
+}
+
+h2 {
+   font-weight: normal;
+   margin: 0;
+}
+
+h2>a {
+   position: absolute !important;
+   right: 0;
+   font-size: 13px;
+   text-decoration: none;
+}
+
+div.donate {
+   justify-content: space-between;
+   display: flex;
+   flex-direction: row;
+}
+div.donate > a {
+   align-self: center;
+}

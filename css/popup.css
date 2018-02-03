@@ -1,5 +1,6 @@
-/* body {
-} */
+body {
+   min-width: 450px;
+}
 
 .container {
    padding: 10px;
@@ -12,9 +13,9 @@
 }
 
 textarea {
-   /* border-color: rgba(0, 0, 0, 0); */
    max-height: 150px;
    min-height: 30px;
+   resize: vertical;
 }
 
 textarea.translated-out {
@@ -23,25 +24,28 @@ textarea.translated-out {
 }
 
 .playVoice {
-   opacity: 1 !important;
    position: absolute;
-   right: 0;
-   bottom: 0;
+   right: 1px;
+   bottom: 2px;
    width: 18px;
    height: 18px;
    text-decoration: none;
    overflow: hidden;
    padding-left: 5px;
    outline: none;
+   color: #000;
+   opacity: .6;
+   /* color: #666; */
    /* transition: all .2s ease; */
 }
 
-.playVoice:not(:hover) {
+/* .playVoice:not(:hover) {
    transition: 3s;
-}
+} */
 
 .playVoice:hover {
-   color: #000;
+   /* color: #000; */
+   opacity: 1;
 }
 
 .playVoice:active {
@@ -49,5 +53,5 @@ textarea.translated-out {
 }
 
 .playVoice>* {
-   font-size: 1.5em !important;
+   font-size: 1.4em !important;
 }
