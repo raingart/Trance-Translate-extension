@@ -324,7 +324,7 @@ try {
 
       App.getUI.textToSpeakOut.addEventListener("click", function () {
          App.speakPlay(this, {
-            textToSpeak: App.getUI.textTranslated.value,
+            textToSpeak: App.getUI.textTranslated.value.split(/(\n\w+:\n1.)/)[0],
             to_language: App.getUI.translatedTo.value,
          });
       });
