@@ -30,6 +30,7 @@ try {
 
          clearText: () => {
             App.getUI.textOriginal.value = App.getUI.textOriginal.value.trim();
+            App.getUI.textTranslated.value = App.getUI.textTranslated.value.trim();
             App.autoHeightTag(App.getUI.textOriginal);
             App.autoHeightTag(App.getUI.textTranslated);
          },
@@ -90,6 +91,7 @@ try {
             var i = 0;
             if (status) {
                var text = "loading";
+               App.getUI.textTranslated.value = text;
                App.temploadingMessage = setInterval(() => {
                   App.getUI.textTranslated.value = text + Array((++i % 4) + 1).join(".");
                }, 300);
@@ -328,7 +330,6 @@ try {
             to_language: App.getUI.translatedTo.value,
          });
       });
-
 
       App.getUI.exchangeLang.addEventListener("click", App.exchangeLanguages, false);
 

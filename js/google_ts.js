@@ -146,11 +146,11 @@ translateAPI.Google = {
 						for (let j=0; j<dict[i][1].length; j++)
                      out.push( (j+1) + ". " + dict[i][1][j] );
 
-						// out.push( "" );
+						out.push( "" );
 					}
             }
             // collect result
-            return out.join('\n')
+            return out.join('\n');
          })(),
          
          'detectLang': res[2],
