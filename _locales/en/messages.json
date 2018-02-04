@@ -95,7 +95,7 @@
    },
    "opt_bth_save_settings_processed": {
       "description": "option save button settings is processed",
-      "message": "Saved"
+      "message": "Saved!"
    },
    "opt_bth_save_settings_tooltip": {
       "description": "option save button settings title",

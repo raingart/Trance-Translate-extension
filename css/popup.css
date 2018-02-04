@@ -25,8 +25,8 @@ textarea.translated-out {
 
 .playVoice {
    position: absolute;
-   right: 1px;
-   bottom: 2px;
+   right: 0;
+   bottom: 0;
    width: 18px;
    height: 18px;
    text-decoration: none;

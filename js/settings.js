@@ -10,23 +10,31 @@ window.addEventListener('load', (evt) => {
          hotkeySend: document.getElementById('hotkeySend'),
       },
 
-      // Saves options to localStorage/chromeSync.
-      saveOptions: function (k) {
-         var optionsSave = {};
-         // optionsSave['hotkeySend'] = App.getUI.hotkeySend.checked ? true : false;
-         optionsSave['hotkeySend'] = App.getUI.hotkeySend.value;
-         Storage.setParams(optionsSave, false /*local*/ );
-
-         // k.innerHTML = chrome.i18n.getMessage("opt_bth_save_process");
-         k.innerHTML = chrome.i18n.getMessage("opt_bth_save_settings_processed");
-         // k.classList.add("disabled");
-         // k.classList.add("in-progress");
+      bthAnimation: function (k) {
+         k.innerHTML = chrome.i18n.getMessage("opt_bth_save_settings_process");
+         k.classList.add("disabled");
+         k.classList.add("in-progress");
+         setTimeout(function () {
+            k.innerHTML = chrome.i18n.getMessage("opt_bth_save_settings_processed");
+            k.classList.remove("in-progress");
+         }, 1000);
          setTimeout(function () {
             k.innerHTML = chrome.i18n.getMessage("opt_bth_save_settings");
             // k.classList.toggle("in-progress");
-            // k.classList.remove("disabled");
-         }, 1500);
-         chrome.runtime.reload();
+            k.classList.remove("disabled");
+            chrome.runtime.reload();
+         }, 2000);
+      },
+
+      // Saves options to localStorage/chromeSync.
+      saveOptions: function (b) {
+         var optionsSave = {};
+         optionsSave['hotkeySend'] = App.getUI.hotkeySend.value;
+
+         // Storage.setParams(optionsSave, false /*local*/ );
+         Storage.setParams(optionsSave, true /*sync*/ );
+
+         App.bthAnimation(b)
       },
 
       init: function () {

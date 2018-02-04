@@ -6,7 +6,7 @@ try {
    window.addEventListener('load', (evt) => {
 
       const App = {
-         debug: true,
+         // debug: true,
 
          translateProvider: {
             langlist: translateAPI['Google'].langlist,
@@ -26,12 +26,6 @@ try {
             textToSpeakOut: document.getElementById('btn-text-to-speak-out'),
             bthTranslate: document.getElementById('bth-translate'),
             bthOpenSettings: document.getElementById('bth-open-settings'),
-         },
-
-         analytics: () => {
-            var x = document.createElement('script');
-            x.src = '/lib/analytics.min.js';
-            document.getElementsByTagName("head")[0].appendChild(x);
          },
 
          clearText: () => {
@@ -264,8 +258,6 @@ try {
 
             App.bildOptionTag(App.getUI.translatedFrom, App.translateProvider.langlist);
             App.bildOptionTag(App.getUI.translatedTo, App.translateProvider.langlist);
-
-            if (!App.debug) App.analytics();
          },
 
          log: (msg, arg1) => {

@@ -1,30 +1,27 @@
 body {
-   margin: 0 auto;
-   font-size: 13px;
    min-width: 450px;
-   line-height: 1.4;
-}
-
-hr {
-   margin: 5px auto 8px;
 }
 
 .container {
    padding: 0 10px 10px;
+   position: relative;
 }
 
 .container>div.item {
    padding: 8px 0;
 }
 
-.container>div.item:not(:last-child) {
+/* .container>div.item:not(:last-child) {
+   border-bottom: 1px solid #e0e0e0;
+} */
+
+.container>div.item.containerL:not(:last-child) {
    border-top: 1px solid #e0e0e0;
    border-bottom: 1px solid #e0e0e0;
 }
 
-.containerL>div.item:first-child {
+.containerL>div.item:last-child {
    margin: 0 5px;
-   border-top: 0 !important;
 }
 
 label {
@@ -54,23 +51,21 @@ label>span>q {
    flex-direction: column;
 }
 
+hr {
+   margin: 5px auto 8px;
+}
+
 h2 {
    font-weight: normal;
    margin: 0;
 }
 
-h2>a {
-   position: absolute !important;
-   right: 0;
-   font-size: 13px;
-   text-decoration: none;
-}
-
-div.donate {
+div.between {
    justify-content: space-between;
    display: flex;
    flex-direction: row;
 }
-div.donate > a {
+
+div.between>a {
    align-self: center;
 }
