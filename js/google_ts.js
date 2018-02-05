@@ -136,6 +136,7 @@ translateAPI.Google = {
             for (let i in sentences)
                out.push( sentences[i][0] );
 
+            // out.push( "]|[" );
             out.push( "" );
 
             // dictionary
@@ -147,11 +148,14 @@ translateAPI.Google = {
 						for (let j=0; j<dict[i][1].length; j++)
                      out.push( (j+1) + ". " + dict[i][1][j] );
 
+						// out.push( "|||" );
 						out.push( "" );
 					}
+               // collect result
+               return out.join('\n');
             }
-            // collect result
-            return out.join('\n');
+            
+            return out.toString();
          })(),
          
          'detectLang': res[2],
