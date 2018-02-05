@@ -1,4 +1,4 @@
-console.log(chrome.i18n.getMessage("app_name") + ": init settings.js");
+console.log(i18n("app_name") + ": init settings.js");
 
 window.addEventListener('load', (evt) => {
 
@@ -11,15 +11,15 @@ window.addEventListener('load', (evt) => {
       },
 
       bthAnimation: function (k) {
-         k.innerHTML = chrome.i18n.getMessage("opt_bth_save_settings_process");
+         k.innerHTML = i18n("opt_bth_save_settings_process");
          k.classList.add("disabled");
          k.classList.add("in-progress");
          setTimeout(function () {
-            k.innerHTML = chrome.i18n.getMessage("opt_bth_save_settings_processed");
+            k.innerHTML = i18n("opt_bth_save_settings_processed");
             k.classList.remove("in-progress");
          }, 1000);
          setTimeout(function () {
-            k.innerHTML = chrome.i18n.getMessage("opt_bth_save_settings");
+            k.innerHTML = i18n("opt_bth_save_settings");
             // k.classList.toggle("in-progress");
             k.classList.remove("disabled");
             chrome.runtime.reload();
@@ -38,8 +38,9 @@ window.addEventListener('load', (evt) => {
       },
 
       init: function () {
-         var callback = (res) => Storage.restoreOptions(res);
-         Storage.getParams(null, callback, false /*local*/ );
+         var callback = (res) => Storage.retrieveOptions(res);
+         // Storage.getParams(null, callback, false /*local*/ );
+         Storage.getParams(null, callback, true /*sync*/ );
       },
 
       log: (msg, arg1) => {

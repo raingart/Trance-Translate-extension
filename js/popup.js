@@ -1,4 +1,4 @@
-console.log(chrome.i18n.getMessage("app_name") + ": init popup.js");
+console.log(i18n("app_name") + ": init popup.js");
 
 try {
 
@@ -36,6 +36,10 @@ try {
          },
 
          translate: (dispatch, callback) => {
+            // block flude
+            if (App.temploadingMessage)
+               return false;
+
             App.exchangeText(); // if in ''
 
             var dispatch = dispatch || {
@@ -79,7 +83,7 @@ try {
 
             if (App.getUI.translatedFrom.value.replace(/~.+$/, '') == '') { //create Auto Detected (rapam)
                App.getUI.translatedFrom[0].value = '~' + parameter.detectLang;
-               App.getUI.translatedFrom[0].innerHTML = chrome.i18n.getMessage("translate_from_language") +
+               App.getUI.translatedFrom[0].innerHTML = i18n("translate_from_language") +
                   ' (' + App.translateProvider.langlist[parameter.detectLang] + ')';
             }
 
@@ -88,15 +92,17 @@ try {
          },
 
          showLoading: (status) => {
-            var i = 0;
-            if (status) {
+            if (status && !App.temploadingMessage) {
+               var i = 0;
                var text = "loading";
                App.getUI.textTranslated.value = text;
                App.temploadingMessage = setInterval(() => {
                   App.getUI.textTranslated.value = text + Array((++i % 4) + 1).join(".");
                }, 300);
-            } else
+            } else {
                clearInterval(App.temploadingMessage);
+               App.temploadingMessage = false;
+            }
          },
 
          setSelectOption: (selectObj, val) => {
@@ -167,16 +173,24 @@ try {
          speakPlay: (el, args) => {
             el.classList.add("disabled");
             var ico = el.querySelectorAll('i')[0]; //ttf awesome icon
-            ico.classList.toggle("icon-volume-down");
-            ico.classList.add("icon-volume-up");
 
-            App.translateProvider.toSpeak(args, (outAudio) => {
-               outAudio.start(0);
-               setTimeout(() => {
-                  ico.classList.toggle("icon-volume-down");
+            // ico.classList.remove("icon-volume-off");
+            // ico.classList.toggle("icon-volume-down");
+
+            App.translateProvider.toSpeak(args, (audio) => {
+               ico.classList.remove("icon-volume-down");
+               ico.classList.add("icon-volume-up");
+               
+               audio.addEventListener('ended', function () {
+                  console.log('playing end');
                   ico.classList.remove("icon-volume-up");
+                  ico.classList.add("icon-volume-down");
+                  // ico.classList.toggle("icon-volume-off");
+                  
                   el.classList.remove("disabled");
-               }, 1000);
+               });
+
+               audio.start();
             });
          },
 
@@ -230,23 +244,28 @@ try {
 
             load: () => {
                var callback = ((res) => {
-                  Storage.restoreOptions(res);
+                  Storage.retrieveOptions(res);
 
                   App.clearText();
                   // App.getUI.textOriginal.focus();
                   App.getUI.textOriginal.select();
 
-                  App.tempSaveStorage = res;
-                  // App.getUI.bthTranslate.setAttribute("title", res.hotkeySend.replace(/-/, '+') || 'Enter');
-
                   // restore Auto Detected (rapam) in load
                   if (res['lang-from'] && res['lang-from'].charAt(0) == '~') {
                      App.getUI.translatedFrom[0].value = res['lang-from'];
-                     App.getUI.translatedFrom[0].innerHTML = chrome.i18n.getMessage("translate_from_language") + ' (' + App.translateProvider.langlist[res['lang-from'].substr(1)] + ')';
+                     App.getUI.translatedFrom[0].innerHTML = i18n("translate_from_language") + ' (' + App.translateProvider.langlist[res['lang-from'].substr(1)] + ')';
                   }
                });
 
                Storage.getParams(null /*all*/ , callback, false /*local*/ );
+               
+               var callback_sync = (res) => {
+                  App.tempSync = res;
+                  
+                  var hotkeySend = res.hotkeySend ? res.hotkeySend.replace(/-/, '+') : 'Enter';
+                  App.getUI.bthTranslate.setAttribute("title", hotkeySend);
+               }
+               Storage.getParams(null, callback_sync, true /*local*/ );
             },
          },
 
@@ -293,13 +312,15 @@ try {
          } else if (e.shiftKey && e.which == 13) { //shift
             storeHotKey.push('shift')
             storeHotKey.push('enter');
-         } else if (e.which == 13) { //enter
+         } else if (e.altKey) //alt
+            storeHotKey.push('alt');
+         else if (e.which == 13) //enter
             storeHotKey.push('enter');
-         }
+
          // storeHotKey.push(String.fromCharCode(e.keyCode));
 
-         var sendHotKey = App.tempSaveStorage.hotkeySend ?
-            App.tempSaveStorage.hotkeySend.toLowerCase() : 'enter';
+         var sendHotKey = App.tempSync.hotkeySend ?
+            App.tempSync.hotkeySend.toLowerCase() : 'enter';
 
          var storeHotKey = storeHotKey.join("-").toString().toLowerCase();
          App.log('storeHotKey ' + storeHotKey);
@@ -314,6 +335,14 @@ try {
 
       App.getUI.textOriginal.addEventListener("input", function () {
          App.autoHeightTag(this);
+      });
+
+      document.addEventListener("keydown", async (e) => {
+         if (e.altKey && e.which == 13)
+            App.speakPlay(App.getUI.textToSpeakIn, {
+               textToSpeak: App.getUI.textOriginal.value,
+               to_language: App.getUI.translatedFrom.value.replace(/~/, ''), //clear prefix temp lang 
+            });
       });
 
       // App.getUI.textToSpeakIn.onclick = async(event) => {
@@ -335,6 +364,11 @@ try {
 
       App.getUI.bthTranslate.addEventListener("click", function () {
          App.translate();
+
+         this.classList.add("disabled");
+         setTimeout(() => {
+            this.classList.remove("disabled");
+         }, 500);
       });
 
       App.getUI.bthOpenSettings.addEventListener("click", function () {

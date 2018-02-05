@@ -1,4 +1,4 @@
-console.log(chrome.i18n.getMessage("app_name") + ": init background.js");
+console.log(i18n("app_name") + ": init background.js");
 
 var Core = {
    // createContextMenu: function (menuItemId) {
@@ -15,12 +15,12 @@ var Core = {
       toWeb: translateAPI['Google'].toWeb
    },
 
-   notify: function (title, msg, icon) {
+   showNotification: function (title, msg, icon) {
       var manifest = chrome.runtime.getManifest();
       chrome.notifications.create('info', {
          type: 'basic',
          iconUrl: icon || manifest.icons['48'], //48,128
-         title: title || chrome.i18n.getMessage("app_name"),
+         title: title || i18n("app_name"),
          // "priority": 2,
          message: msg || ''
       }, function (notificationId) {
@@ -52,7 +52,7 @@ var Core = {
                url: tab.url
             });
          } else
-            alert(chrome.i18n.getMessage("msg_not_access_tab"));
+            alert(i18n("msg_not_access_tab"));
       });
 
       function validURL(str) {
@@ -78,7 +78,7 @@ var Core = {
          Core.translateProvider.toWeb(dispatch);
       } else {
          var notifyCallback = function (params) {
-            Core.notify(chrome.i18n.getMessage("app_short_name") +
+            Core.showNotification(i18n("app_short_name") +
                ' [' + /*params.detectLang*/ Core.conf.fromLang + ' > ' + Core.conf.toLang + ']',
                params.translated_text);
          };
@@ -111,12 +111,12 @@ var Core = {
 
          chrome.contextMenus.create({
             id: 'translate-selection',
-            title: chrome.i18n.getMessage("context_menu_selection"),
+            title: i18n("context_menu_selection"),
             contexts: ["selection"]
          });
          chrome.contextMenus.create({
             id: 'translate-page',
-            title: chrome.i18n.getMessage("context_menu_page"),
+            title: i18n("context_menu_page"),
             // onclick: getword,
          });
 

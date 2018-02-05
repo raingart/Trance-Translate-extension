@@ -1,4 +1,4 @@
-console.log(chrome.i18n.getMessage("app_name") + ": init google_ts.js");
+console.log(i18n("app_name") + ": init google_ts.js");
 
 const translateAPI = {};
 
@@ -56,15 +56,16 @@ translateAPI.Google = {
          let soundUrl = translateAPI.Google.googleHost + '/translate_tts?ie=UTF-8&client=tw-ob' +
             '&tl=' + to +
             '&q=' + textToSpeak;
+            // '&q=' + encodeURIComponent(textToSpeak);
          // translateAPI.Google.log('url:', url);
 
          let type = request.type || 'arrayBuffer';
          let payload = request.payload || {};
 
-         let audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-         let source = audioCtx.createBufferSource();
-
          let _callback = ((buffer) => {
+            let audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+            let source = audioCtx.createBufferSource();
+            
             audioCtx.decodeAudioData(buffer, (decodedData) => {
                source.buffer = decodedData;
                source.connect(audioCtx.destination);

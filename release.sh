@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# chmod a+x name.sh
+# chmod a+x release.sh
 
 FILENAME='Tractor'
 # TODAY=$(date)
@@ -17,6 +17,6 @@ zip -r $FILENAME.zip \
                   css/*/*.css \
                   css/*.css \
                   manifest.json \
-                  # html/*.html \
+                  LICENSE \
 
- # -z $TODAY
+#  -z $TODAY
