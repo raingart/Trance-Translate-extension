@@ -1,22 +1,15 @@
 console.log(i18n("app_name") + ": init background.js");
 
-var Core = {
-   // createContextMenu: function (menuItemId) {
-   //    chrome.contextMenus.create({
-   //       id: menuItemId || 'test',
-   //       title: chrome.i18n.getMessage("translate_context_menu"),
-   //       contexts: ["selection"]
-   //    });
-   // },
+const Core = {
 
    translateProvider: {
       toText: translateAPI['Google'].toText,
-      toUrl: translateAPI['Google'].toUrl,
+      toUrl: translateAPI['Google'].openNewTab,
       toWeb: translateAPI['Google'].toWeb
    },
 
-   showNotification: function (title, msg, icon) {
-      var manifest = chrome.runtime.getManifest();
+   showNotification: (title, msg, icon) => {
+      let manifest = chrome.runtime.getManifest();
       chrome.notifications.create('info', {
          type: 'basic',
          iconUrl: icon || manifest.icons['48'], //48,128
@@ -31,22 +24,13 @@ var Core = {
       });
    },
 
-   validURL: (str) => {
-      var regex = /(http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
-      if (!regex.test(str)) {
-         console.log("Not valid URL", str);
-         return false;
-      } else
-         return true;
-   },
-
    translatePage: () => {
       chrome.tabs.query({
          active: true,
          lastFocusedWindow: true
       }, (tabs) => {
-         var tab = tabs[0];
-         if (this.validURL(tab.url)) {
+         let tab = tabs[0];
+         if (Core.isLink(tab.url)) {
             Core.translateProvider.toUrl({
                to_language: Core.conf.toLang,
                url: tab.url
@@ -54,21 +38,14 @@ var Core = {
          } else
             alert(i18n("msg_not_access_tab"));
       });
-
-      function validURL(str) {
-         var regex = /(http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
-         if (!regex.test(str)) {
-            console.log("Not valid URL", str);
-            return false;
-         } else
-            return true;
-      }
    },
 
-   translateSelection: function (text) {
-      var text = text.trim();
+   translateToNotification: (str) => {
+      if (!str) return false;
 
-      var dispatch = {
+      let text = str.toString().trim();
+
+      let dispatch = {
          from_language: Core.conf.fromLang,
          to_language: Core.conf.toLang,
          original_text: text,
@@ -76,8 +53,9 @@ var Core = {
 
       if (text.length > 200) { //max notifyCallback symbols 
          Core.translateProvider.toWeb(dispatch);
+
       } else {
-         var notifyCallback = function (params) {
+         let notifyCallback = function (params) {
             Core.showNotification(i18n("app_short_name") +
                ' [' + /*params.detectLang*/ Core.conf.fromLang + ' > ' + Core.conf.toLang + ']',
                params.translated_text);
@@ -86,46 +64,87 @@ var Core = {
       }
    },
 
-   loadDefaultSettings: function (res) {
+   // selectionIndicator: () => {
+   //       let selected = window.getSelection().toString();
+   //       // let icon = selected.length ? '' : manifest.icons['16'];
+   //       let icon = selected.length ? 'y' : 'n';
+
+   //       // chrome.browserAction.setIcon({ path: icon });
+   //       chrome.browserAction.setBadgeText({ text: icon });
+   // },
+
+   createContextMenu: () => {
+      chrome.contextMenus.create({
+         id: 'translate-context',
+         title: i18n("context_menu_selection"),
+         contexts: ["selection"]
+      });
+      chrome.contextMenus.create({
+         id: 'translate-page',
+         title: i18n("context_menu_page"),
+         // onclick: getword,
+      });
+   },
+
+   commandRun: (command, callback) => {
+      switch (command) {
+         case 'translate-context':
+            let text = typeof callback === 'string' ? callback : false;
+            Core.translateToNotification(text);
+            break;
+         case 'translate-hokey':
+            Core.getSelectionText(Core.translateToNotification);
+            break;
+         case 'translate-page':
+            Core.translatePage();
+            break;
+            // default:
+            //   console.log('Sorry, we are out of ' + expr + '.');
+      }
+   },
+
+   isLink: (link) => {
+      return (/http:|https:|ftp:/.test(link.split('/')[0])) ? true : false;
+   },
+
+   getSelectionText: (callback) => {
+      // chrome.tabs.query({active: true, currentWindow: true}, (tab) => {
+      chrome.tabs.getSelected(null, (tab) => {
+         if (Core.isLink(tab.url))
+            chrome.tabs.executeScript({
+               code: "window.getSelection().toString()",
+               allFrames: true
+            }, (selection) => {
+
+               let selected = selection.filter((x) => {
+                  return (x !== (undefined || null || ''));
+               });
+
+               if (selected.length) {
+                  if (callback && typeof (callback) === "function") {
+                     // return callback(selection.toString());
+                     callback(selection.toString());
+                  }
+               }
+            });
+      });
+   },
+
+   loadDefaultSettings: (res) => {
       Core.conf = {};
       Core.conf.fromLang = res['lang-from'] && res['lang-from'].charAt(0) == '~' ? "auto" : res['lang-from'];
       Core.conf.toLang = res['lang-to'] || "en";
       console.log('loadDefaultSettings', JSON.stringify(Core.conf));
    },
 
-   selectionIndicator: function () {
-      //    var selected = window.getSelection().toString();
-      //    // var icon = selected.length > 0 ? '' : manifest.icons['16'];
-      //    var icon = selected.length > 0 ? 'y' : 'n';
-
-      //    // chrome.browserAction.setIcon({ path: icon });
-      //    chrome.browserAction.setBadgeText({ text: icon });
-   },
-
-   init: function () {
+   init: () => {
       console.log('Core init');
+      
+      Core.createContextMenu();
 
-      var callback = function (res) {
-         Core.loadDefaultSettings(res);
-         // Core.createContextMenu('selection-translate-google');
-
-         chrome.contextMenus.create({
-            id: 'translate-selection',
-            title: i18n("context_menu_selection"),
-            contexts: ["selection"]
-         });
-         chrome.contextMenus.create({
-            id: 'translate-page',
-            title: i18n("context_menu_page"),
-            // onclick: getword,
-         });
-
-      };
+      let callback = (res) => Core.loadDefaultSettings(res);
+      
       Storage.getParams(null, callback, false);
-
-      // Core.timerSelection = setTimeout(function () {
-      //    Core.selectionIndicator();
-      // }, 100);
    },
 };
 
@@ -134,30 +153,23 @@ Core.init();
 // Register the event handlers.
 chrome.contextMenus.onClicked.addListener(function (clickData, tab) {
    // console.log('clickData.menuItemId:', clickData.menuItemId);
-   switch (clickData.menuItemId) {
-      case 'translate-selection':
-         Core.translateSelection(clickData.selectionText);
-         break;
-      case 'translate-page':
-         Core.translatePage();
-         break;
-         // case 'test':
-         //    alert('clickData.menuItemId:\n' + clickData.menuItemId)
-         //    break;
-         // default:
-         //   console.log('Sorry, we are out of ' + expr + '.');
-   }
+   Core.commandRun(clickData.menuItemId, clickData.selectionText);
 });
 
-var manifest = chrome.runtime.getManifest();
-var uninstallUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdgDabLtk8vapLTEXKoXucHVXLrDujBrXZg418mGrLE0zND2g/viewform?usp=pp_url&entry.1936476946&entry.1337380930&entry.1757501795=";
-uninstallUrl += encodeURIComponent(manifest.short_name + ' (v' + manifest.version + ')');
+// hotkey
+chrome.commands.onCommand.addListener(function (onCommand) {
+   console.log('Command:', onCommand);
 
-chrome.runtime.setUninstallURL(uninstallUrl, function (details) {
-   var lastError = chrome.runtime.lastError;
-   if (lastError && lastError.message) {
-      console.warn("Unable to set uninstall URL: " + lastError.message);
-   } else {
-      // The url is set
-   }
+   Core.commandRun(onCommand);
+});
+
+// calls
+// chrome.runtime.onMessage.addListener(handleMessage);
+// function handleMessage(request, sender, sendResponse) { }
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+   // console.log('core onMessage ',request.command);
+   console.log('request', request);
+   console.log('sender', sender);
+
+   Core.commandRun(request.command || request, sendResponse);
 });

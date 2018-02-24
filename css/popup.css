@@ -1,5 +1,5 @@
 body {
-   min-width: 450px;
+   min-width: 480px;
    /* background-color: #ECEFF4; */
 }
 
@@ -8,9 +8,22 @@ body {
 }
 
 .container>.container {
-   flex-direction: row;
-   justify-content: space-between;
+   display: grid;
+   grid-template-columns: repeat(1, 1fr);
+   grid-template-columns: 1fr auto;
+   /* grid-gap: 10px;
+   grid-auto-rows: 100px; */
+   grid-template-areas: "a b";
+   /* align-items: start; */
    padding: 8px 0;
+}
+
+.container>.container>.item:nth-child(1) {
+   grid-area: a;
+}
+
+.container>.container>.item:nth-child(2) {
+   grid-area: b;
 }
 
 textarea {

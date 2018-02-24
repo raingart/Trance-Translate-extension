@@ -10,37 +10,36 @@ window.addEventListener('load', (evt) => {
          hotkeySend: document.getElementById('hotkeySend'),
       },
 
-      bthAnimation: function (k) {
+      bthAnimation: (k) => {
          k.innerHTML = i18n("opt_bth_save_settings_process");
          k.classList.add("disabled");
          k.classList.add("in-progress");
          setTimeout(function () {
             k.innerHTML = i18n("opt_bth_save_settings_processed");
             k.classList.remove("in-progress");
-         }, 1000);
-         setTimeout(function () {
+         }, 200);
+         setTimeout(() => {
             k.innerHTML = i18n("opt_bth_save_settings");
             // k.classList.toggle("in-progress");
             k.classList.remove("disabled");
             chrome.runtime.reload();
-         }, 2000);
+         }, 400);
       },
 
       // Saves options to localStorage/chromeSync.
-      saveOptions: function (b) {
+      saveOptions: (el) => {
          var optionsSave = {};
          optionsSave['hotkeySend'] = App.getUI.hotkeySend.value;
 
          // Storage.setParams(optionsSave, false /*local*/ );
-         Storage.setParams(optionsSave, true /*sync*/ );
-
-         App.bthAnimation(b)
+         Storage.setParams(optionsSave, true /*true-sync / false-local*/ );
+         
+         App.bthAnimation(el)
       },
 
-      init: function () {
+      init: () => {
          var callback = (res) => Storage.retrieveOptions(res);
-         // Storage.getParams(null, callback, false /*local*/ );
-         Storage.getParams(null, callback, true /*sync*/ );
+         Storage.getParams(null /*all*/, callback, true /*true-sync / false-local*/ );
       },
 
       log: (msg, arg1) => {

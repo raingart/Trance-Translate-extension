@@ -18,5 +18,4 @@ zip -r $FILENAME.zip \
                   css/*.css \
                   manifest.json \
                   LICENSE \
-
 #  -z $TODAY

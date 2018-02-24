@@ -15,9 +15,10 @@
       "description": "Extension's description",
       "message": "Trance is a easy minimalist translator"
    },
-   "app_title": {
-      "description": "Extension's title",
-      "message": "Translate Selected"
+
+   "hotkey_translate_notification_desc": {
+      "description": "hotkey translate popup description",
+      "message": "Translate selected to notification"
    },
 
    "translate_in_placeholder": {
@@ -34,7 +35,7 @@
    },
    "translate_choice_exchange_title": {
       "description": "Exchange title",
-      "message": "Exchange places language"
+      "message": "Exchange places language (Shift+Ctrl)"
    },
    "translate_to_language_title": {
       "description": "Target language title",

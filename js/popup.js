@@ -1,394 +1,276 @@
 console.log(i18n("app_name") + ": init popup.js");
 
-try {
+const App = {
+   // debug: true,
 
-   // When the popup HTML has loaded
-   window.addEventListener('load', (evt) => {
+   translateProvider: {
+      langlist: translateAPI['Google'].langlist,
+      toText: translateAPI['Google'].toText,
+      toSpeak: translateAPI['Google'].toSpeak
+   },
 
-      const App = {
-         // debug: true,
+   clearText: () => {
+      UI.textOriginal.value = UI.textOriginal.value.trim();
+      UI.textTranslated.value = UI.textTranslated.value.trim();
+      App.autoHeightTag(UI.textOriginal);
+      App.autoHeightTag(UI.textTranslated);
+   },
 
-         translateProvider: {
-            langlist: translateAPI['Google'].langlist,
-            toText: translateAPI['Google'].toText,
-            toSpeak: translateAPI['Google'].toSpeak
-         },
+   translate: (dispatch, callback) => {
+      // block flude
+      if (App.timerLoadingMsg) return false;
 
-         getUI: {
-            translatedFrom: document.getElementById('lang-from'),
-            translatedTo: document.getElementById('lang-to'),
-            textOriginal: document.getElementById('text-original') ||
-               document.querySelectorAll('textarea')[0],
-            textTranslated: document.getElementById('text-translated') ||
-               document.querySelectorAll('textarea')[1],
-            exchangeLang: document.getElementById('bth-lang-exchange'),
-            textToSpeakIn: document.getElementById('btn-text-to-speak-in'),
-            textToSpeakOut: document.getElementById('btn-text-to-speak-out'),
-            bthTranslate: document.getElementById('bth-translate'),
-            bthOpenSettings: document.getElementById('bth-open-settings'),
-         },
+      App.exchangeText(); // if in ''
 
-         clearText: () => {
-            App.getUI.textOriginal.value = App.getUI.textOriginal.value.trim();
-            App.getUI.textTranslated.value = App.getUI.textTranslated.value.trim();
-            App.autoHeightTag(App.getUI.textOriginal);
-            App.autoHeightTag(App.getUI.textTranslated);
-         },
-
-         translate: (dispatch, callback) => {
-            // block flude
-            if (App.temploadingMessage)
-               return false;
-
-            App.exchangeText(); // if in ''
-
-            var dispatch = dispatch || {
-               from_language: App.getUI.translatedFrom.value.replace(/~.+$/, ''), //clear prefix temp lang 
-               to_language: App.getUI.translatedTo.value,
-               original_text: App.getUI.textOriginal.value,
-            };
-
-            if (dispatch.original_text) { //skip if empty text
-               var callback = callback || ((parameter) => {
-                  App.log('resirve:', JSON.stringify(parameter));
-                  App.showLoading(false);
-
-                  // if translated To == From invert lang
-                  // set new callback
-                  if (parameter.detectLang == dispatch.to_language &&
-                     dispatch.from_language != dispatch.to_language) {
-                     // App.setSelectOption(App.getUI.translatedTo, App.getUI.translatedFrom.value);
-                     App.exchangeLanguages();
-                     var callback = ((parameter) => {
-                        App.log('resirve:', JSON.stringify(parameter));
-                        App.showLoading(false);
-                        App.makeReturn(parameter);
-                        App.confStorage.update();
-                        App.exchangeLanguages();
-                     });
-                     App.translate(false, callback);
-                  } else {
-                     App.makeReturn(parameter);
-                     App.confStorage.update();
-                  }
-               });
-               App.showLoading(true);
-               App.clearText();
-               App.translateProvider.toText(dispatch, callback);
-            }
-         },
-
-         makeReturn: (parameter) => {
-            App.getUI.textTranslated.value = parameter.translated_text;
-
-            if (App.getUI.translatedFrom.value.replace(/~.+$/, '') == '') { //create Auto Detected (rapam)
-               App.getUI.translatedFrom[0].value = '~' + parameter.detectLang;
-               App.getUI.translatedFrom[0].innerHTML = i18n("translate_from_language") +
-                  ' (' + App.translateProvider.langlist[parameter.detectLang] + ')';
-            }
-
-            App.clearText();
-            App.getUI.textOriginal.focus();
-         },
-
-         showLoading: (status) => {
-            if (status && !App.temploadingMessage) {
-               var i = 0;
-               var text = "loading";
-               App.getUI.textTranslated.value = text;
-               App.temploadingMessage = setInterval(() => {
-                  App.getUI.textTranslated.value = text + Array((++i % 4) + 1).join(".");
-               }, 300);
-            } else {
-               clearInterval(App.temploadingMessage);
-               App.temploadingMessage = false;
-            }
-         },
-
-         setSelectOption: (selectObj, val) => {
-            for (var n = 0; n < selectObj.children.length; n++) {
-               var option = selectObj.children[n];
-
-               // start fix clear "~LangCode"
-               if (option.value.charAt(0) == '~') option.value = '';
-               if (val.charAt(0) == '~') val = '';
-               // fix end
-
-               if (option.value === val) {
-                  option.selected = true;
-                  break
-               }
-            }
-         },
-
-         // getSelectedValue: (e) => {
-         //    return e.children[e.selectedIndex].value
-         // },
-
-         exchangeLanguages: () => {
-            // var translatedFrom_temp = App.getSelectedValue(App.getUI.translatedFrom.value);
-            // var translatedTo_temp = App.getSelectedValue(App.getUI.translatedTo.value);
-            var translatedFrom_temp = App.getUI.translatedFrom.value.replace(/~.+$/, '');
-            var translatedTo_temp = App.getUI.translatedTo.value;
-            App.setSelectOption(App.getUI.translatedFrom, translatedTo_temp);
-            App.setSelectOption(App.getUI.translatedTo, translatedFrom_temp);
-
-            App.exchangeText();
-         },
-
-         //exchange text in textarea
-         exchangeText: () => {
-            var a = App.getUI.textOriginal;
-            var b = App.getUI.textTranslated;
-            if (a.value == '') {
-               b.value = [a.value, a.value = b.value][0];
-            }
-         },
-
-         autoHeightTag: (obj) => {
-            switch (obj.tagName.toLowerCase()) {
-               case 'textarea':
-                  obj.style.height = 'inherit';
-                  obj.style.height = obj.scrollHeight + 3 + 'px';
-                  break;
-               case 'iframe':
-                  obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
-                  break;
-               default:
-                  obj.style.height = 'auto';
-            }
-         },
-
-         bildOptionTag: (selbox, optionVal) => {
-            for (var i in optionVal) {
-               // new Option("key","value")).setAttribute("key","value");
-               selbox.options[selbox.options.length] = new Option(optionVal[i], i);
-               // var r = document.createElement("option");
-               // r.value = i;
-               // r.textContent = optionVal[i];
-               // selectTag.appendChild(r)
-            }
-         },
-
-         speakPlay: (el, args) => {
-            el.classList.add("disabled");
-            var ico = el.querySelectorAll('i')[0]; //ttf awesome icon
-
-            // ico.classList.remove("icon-volume-off");
-            // ico.classList.toggle("icon-volume-down");
-
-            App.translateProvider.toSpeak(args, (audio) => {
-               ico.classList.remove("icon-volume-down");
-               ico.classList.add("icon-volume-up");
-               
-               audio.addEventListener('ended', function () {
-                  console.log('playing end');
-                  ico.classList.remove("icon-volume-up");
-                  ico.classList.add("icon-volume-down");
-                  // ico.classList.toggle("icon-volume-off");
-                  
-                  el.classList.remove("disabled");
-               });
-
-               audio.start();
-            });
-         },
-
-         getSelectionText: () => {
-            // chrome.tabs.query({active: true, currentWindow: true}, function(arrayOfTabs) {
-            chrome.tabs.getSelected(null, (tab) => {
-               if (App.validURL(tab.url))
-                  chrome.tabs.executeScript({
-                     code: "window.getSelection().toString()",
-                     allFrames: true
-                  }, (selection) => {
-                     // get all frames
-                     var selected = selection.filter((x) => {
-                        // return (x !== (undefined || null || ''));
-                        return (x !== (undefined || null || '')) || false;
-                     });
-                     if (selected.length > 0) {
-                        App.getUI.textOriginal.value = selected;
-                        App.translate();
-                     }
-                  });
-            });
-         },
-
-         validURL: (str) => {
-            var regex = /(http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
-            if (!regex.test(str)) {
-               App.log("Not valid URL", str);
-               return false;
-            } else
-               return true;
-         },
-
-         confStorage: {
-            // Saves options to localStorage/chromeSync.
-            update: (reset) => {
-               if (reset) {
-                  chrome.storage.local.clear();
-                  chrome.storage.sync.clear();
-                  console.log('[chrome.storage] clear!');
-               }
-
-               var optionsSave = {};
-               optionsSave['lang-from'] = App.getUI.translatedFrom.value;
-               optionsSave['lang-to'] = App.getUI.translatedTo.value;
-               optionsSave['text-original'] = App.getUI.textOriginal.value.trim();
-               optionsSave['text-translated'] = App.getUI.textTranslated.value;
-
-               Storage.setParams(optionsSave, false /*local*/ );
-            },
-
-            load: () => {
-               var callback = ((res) => {
-                  Storage.retrieveOptions(res);
-
-                  App.clearText();
-                  // App.getUI.textOriginal.focus();
-                  App.getUI.textOriginal.select();
-
-                  // restore Auto Detected (rapam) in load
-                  if (res['lang-from'] && res['lang-from'].charAt(0) == '~') {
-                     App.getUI.translatedFrom[0].value = res['lang-from'];
-                     App.getUI.translatedFrom[0].innerHTML = i18n("translate_from_language") + ' (' + App.translateProvider.langlist[res['lang-from'].substr(1)] + ')';
-                  }
-               });
-
-               Storage.getParams(null /*all*/ , callback, false /*local*/ );
-               
-               var callback_sync = (res) => {
-                  App.tempSync = res;
-                  
-                  var hotkeySend = res.hotkeySend ? res.hotkeySend.replace(/-/, '+') : 'Enter';
-                  App.getUI.bthTranslate.setAttribute("title", hotkeySend);
-               }
-               Storage.getParams(null, callback_sync, true /*local*/ );
-            },
-         },
-
-         init: () => {
-            App.log('App Init');
-
-            // App.confStorage.update('clear')
-            App.confStorage.load();
-
-            App.getSelectionText();
-
-            App.bildOptionTag(App.getUI.translatedFrom, App.translateProvider.langlist);
-            App.bildOptionTag(App.getUI.translatedTo, App.translateProvider.langlist);
-         },
-
-         log: (msg, arg1) => {
-            if (App.debug) console.log('[+] ' + msg.toString(), arg1 || '')
-         },
-
-         // langlist: lang.map(code => code.substr(0, 2).toLowerCase()),
-         // return x<y ? -1 : x>y ? 1 : 0;
-         // langlist: lang.forEach(function(value, key) {
-         //    // console.log(key + ' = ' + value);
-         //  }),
+      let dispatch_ = dispatch || {
+         from_language: UI.translatedFrom.value.replace(/~.+$/, ''), //clear prefix temp lang 
+         to_language: UI.translatedTo.value,
+         original_text: UI.textOriginal.value,
       };
 
-      App.init();
+      if (dispatch_.original_text) { //skip if empty text
+         let callback_ = callback || ((parameter) => {
+            App.log('resirve:', JSON.stringify(parameter));
+            // console.log('resirve:', JSON.stringify(parameter));
+            App.showLoading(false);
 
-      // mouse move event
-      //    document.addEventListener('mousemove', function(e) {
-      //       mouseX = e.clientX;
-      //       mouseY = e.clientY;
-      //       pageX = e.pageX;
-      //       pageY = e.pageY;
-      //   }, false);
+            // if translated To == From invert lang
+            // set new callback
+            console.log('parameter.detectLang: ' + parameter.detectLang);
+            console.log('dispatch_.to_language: ' + dispatch_.to_language);
+            if (parameter.detectLang == dispatch_.to_language &&
+               dispatch_.from_language != dispatch_.to_language) {
+               // App.setSelectOption(UI.translatedTo, UI.translatedFrom.value);
+               App.exchangeLanguages();
+               let callback = ((parameter) => {
+                  App.log('resirve:', JSON.stringify(parameter));
+                  App.showLoading(false);
+                  App.makeReturn(parameter);
+                  App.confStorage.update();
+                  App.exchangeLanguages();
+               });
+               App.translate(false, callback);
+            } else {
+            App.makeReturn(parameter);
+            App.confStorage.update();
+            }
+         });
+         App.showLoading(true);
+         App.clearText();
+         App.translateProvider.toText(dispatch_, callback_);
+      }
+   },
 
-      // Register the event handlers.
-      App.getUI.textOriginal.addEventListener("keydown", async (e) => {
-         var storeHotKey = [];
+   makeReturn: (parameter) => {
+      UI.textTranslated.value = parameter.translated_text;
 
-         if (e.ctrlKey && e.which == 13) { //ctrl
-            storeHotKey.push('ctrl')
-            storeHotKey.push('enter');
-         } else if (e.shiftKey && e.which == 13) { //shift
-            storeHotKey.push('shift')
-            storeHotKey.push('enter');
-         } else if (e.altKey) //alt
-            storeHotKey.push('alt');
-         else if (e.which == 13) //enter
-            storeHotKey.push('enter');
+      if (UI.translatedFrom.value.replace(/~.+$/, '') == '') { //create Auto Detected (rapam)
+         UI.translatedFrom[0].value = '~' + parameter.detectLang;
+         UI.translatedFrom[0].innerHTML = i18n("translate_from_language") +
+            ' (' + App.translateProvider.langlist[parameter.detectLang] + ')';
+      }
 
-         // storeHotKey.push(String.fromCharCode(e.keyCode));
+      App.clearText();
+      UI.textOriginal.focus();
+   },
 
-         var sendHotKey = App.tempSync.hotkeySend ?
-            App.tempSync.hotkeySend.toLowerCase() : 'enter';
+   showLoading: (status) => {
+      if (status && !App.timerLoadingMsg) {
+         let i = 0;
+         let msg = "loading";
+         UI.textTranslated.value = msg;
+         App.timerLoadingMsg = setInterval(() => {
+            UI.textTranslated.value = msg + Array((++i % 4) + 1).join(".");
+         }, 300);
+      } else {
+         clearInterval(App.timerLoadingMsg);
+         App.timerLoadingMsg = false;
+      }
+   },
 
-         var storeHotKey = storeHotKey.join("-").toString().toLowerCase();
-         App.log('storeHotKey ' + storeHotKey);
+   setSelectOption: (selectObj, val) => {
+      for (let i in selectObj.children) {
+         let option = selectObj.children[i];
 
-         // key is press
-         if (storeHotKey == sendHotKey) {
-            App.log('hit: ' + sendHotKey + '(setting)==' + storeHotKey + '(now)');
-            App.translate()
-            e.preventDefault(); //prevent default behavior
+         // start fix clear "~LangCode"
+         if (option.value.charAt(0) == '~') option.value = '';
+         if (val.charAt(0) == '~') val = '';
+         // fix end
+
+         if (option.value === val) {
+            option.selected = true;
+            break
+         }
+      }
+   },
+
+   // getSelectedValue: (e) => {
+   //    return e.children[e.selectedIndex].value
+   // },
+
+   exchangeLanguages: () => {
+      // let translatedFrom_temp = App.getSelectedValue(UI.translatedFrom.value);
+      // let translatedTo_temp = App.getSelectedValue(UI.translatedTo.value);
+      let translatedFrom_temp = UI.translatedFrom.value.replace(/~.+$/, '');
+      let translatedTo_temp = UI.translatedTo.value;
+      App.setSelectOption(UI.translatedFrom, translatedTo_temp);
+      App.setSelectOption(UI.translatedTo, translatedFrom_temp);
+
+      App.exchangeText();
+   },
+
+   //exchange text in textarea
+   exchangeText: () => {
+      let a = UI.textOriginal;
+      let b = UI.textTranslated;
+      if (a.value == '') {
+         b.value = [a.value, a.value = b.value][0];
+      }
+   },
+
+   autoHeightTag: (obj) => {
+      switch (obj.tagName.toLowerCase()) {
+         case 'textarea':
+            obj.style.height = 'inherit';
+            obj.style.height = obj.scrollHeight + 3 + 'px';
+            break;
+         case 'iframe':
+            obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+            break;
+         default:
+            obj.style.height = 'auto';
+      }
+   },
+
+   bildOptionTag: (selbox, optionVal) => {
+      for (let i in optionVal) {
+         // new Option("key","value")).setAttribute("key","value");
+         selbox.options[selbox.options.length] = new Option(optionVal[i], i);
+         // let r = document.createElement("option");
+         // r.value = i;
+         // r.textContent = optionVal[i];
+         // selectTag.appendChild(r)
+      }
+   },
+
+   speakPlay: (el, args) => {
+      // el.classList.add("disabled");
+      let ico = el.querySelectorAll('i')[0]; //ttf awesome icon
+
+      App.translateProvider.toSpeak(args, (audio) => {
+         audio.start();
+
+         ico.classList.replace("icon-volume-down", "icon-volume-up");
+
+         // general
+         audio.addEventListener('ended', function () {
+            App.log('playing end');
+            enable_el();
+         });
+
+         // spare
+         setTimeout(function () {
+            enable_el();
+         }, 3000);
+
+         function enable_el() {
+            ico.classList.replace("icon-volume-up", "icon-volume-down");
+            App.log('enable_el ' + el.classList.contains("icon-volume-down"));
+            // el.classList.remove("disabled");
          }
       });
+   },
 
-      App.getUI.textOriginal.addEventListener("input", function () {
-         App.autoHeightTag(this);
-      });
+   getSelectionText: () => {
+      chrome.tabs.getSelected(null, (tab) => {
+         if (App.isLink(tab.url))
+            chrome.tabs.executeScript({
+               code: "window.getSelection().toString()",
+               allFrames: true
+            }, (selection) => {
 
-      document.addEventListener("keydown", async (e) => {
-         if (e.altKey && e.which == 13)
-            App.speakPlay(App.getUI.textToSpeakIn, {
-               textToSpeak: App.getUI.textOriginal.value,
-               to_language: App.getUI.translatedFrom.value.replace(/~/, ''), //clear prefix temp lang 
+               let selected = selection.filter((x) => {
+                  return (x !== (undefined || null || ''));
+               });
+
+               if (selected.length) {
+                  UI.textOriginal.value = selected;
+                  App.translate();
+               }
             });
       });
+   },
 
-      // App.getUI.textToSpeakIn.onclick = async(event) => {
-      App.getUI.textToSpeakIn.addEventListener("click", function () {
-         App.speakPlay(this, {
-            textToSpeak: App.getUI.textOriginal.value,
-            to_language: App.getUI.translatedFrom.value.replace(/~/, ''), //clear prefix temp lang 
+   isLink: (link) => {
+      return (/http:|https:|ftp:/.test(link.split('/')[0])) ? true : false;
+   },
+
+   confStorage: {
+      // Saves options to localStorage/chromeSync.
+      update: (reset) => {
+         if (reset) {
+            chrome.storage.local.clear();
+            chrome.storage.sync.clear();
+            console.log('[chrome.storage] clear!');
+         }
+
+         let optionsSave = {};
+         optionsSave['lang-from'] = UI.translatedFrom.value;
+         optionsSave['lang-to'] = UI.translatedTo.value;
+         optionsSave['text-original'] = UI.textOriginal.value.trim();
+         optionsSave['text-translated'] = UI.textTranslated.value;
+
+         Storage.setParams(optionsSave, false /*local*/ );
+      },
+
+      load: () => {
+         // local get textarea and lang-to/from
+         let callback = ((res) => {
+            Storage.retrieveOptions(res);
+
+            App.clearText();
+            
+            // UI.textOriginal.focus();
+            UI.textOriginal.select();
+
+            // restore "Auto Detected (lang-code)"" in load
+            if (res['lang-from'] && res['lang-from'].charAt(0) == '~') {
+               UI.translatedFrom[0].value = res['lang-from'];
+               UI.translatedFrom[0].innerHTML = i18n("translate_from_language") + ' (' + App.translateProvider.langlist[ res['lang-from'].substr(1) ] + ')';
+            }
          });
-      });
+         Storage.getParams(null /*all*/ , callback, false /*local*/ );
 
-      App.getUI.textToSpeakOut.addEventListener("click", function () {
-         App.speakPlay(this, {
-            textToSpeak: App.getUI.textTranslated.value.split(/(\n\w+:\n1.)/)[0],
-            to_language: App.getUI.translatedTo.value,
-         });
-      });
+         // sync get option param
+         let callback_sync = (res) => {
+            App.tempSync = res;
+            // fix title
+            let hotkeySend = res.hotkeySend ? res.hotkeySend.replace(/-/, '+') : 'Enter';
+            UI.bthTranslate.setAttribute("title", hotkeySend);
+         }
+         Storage.getParams(null /*all*/, callback_sync, true  /*true-sync / false-local*/  );
+      },
+   },
 
-      App.getUI.exchangeLang.addEventListener("click", App.exchangeLanguages, false);
+   init: () => {
+      App.log('App Init');
 
-      App.getUI.bthTranslate.addEventListener("click", function () {
-         App.translate();
+      // App.confStorage.update('clear')
+      App.confStorage.load();
 
-         this.classList.add("disabled");
-         setTimeout(() => {
-            this.classList.remove("disabled");
-         }, 500);
-      });
+      App.getSelectionText();
 
-      App.getUI.bthOpenSettings.addEventListener("click", function () {
-         var iframeId = document.querySelectorAll('iframe')[0];
-         iframeId.classList.toggle("hide");
-         if (iframeId.src === '')
-            iframeId.src = '/html/settings.html';
+      App.bildOptionTag(UI.translatedFrom, App.translateProvider.langlist);
+      App.bildOptionTag(UI.translatedTo, App.translateProvider.langlist);
+   },
 
-         iframeId.addEventListener('load', function () {
-            App.autoHeightTag(this);
-         })
-      });
+   log: (msg, arg1) => {
+      if (App.debug) console.log('[+] ' + msg.toString(), arg1 || '')
+   },
 
-   });
-
-
-} catch (err) {
-   // var e = new Error();
-   // e.code = 'NO_ACCESS_TAB';
-   // e.message = err.message;
-   // reject(e);
-   console.warn(JSON.stringify(err));
-}
+   // langlist: lang.map(code => code.substr(0, 2).toLowerCase()),
+   // return x<y ? -1 : x>y ? 1 : 0;
+   // langlist: lang.forEach(function(value, key) {
+   //    // console.log(key + ' = ' + value);
+   //  }),
+};
