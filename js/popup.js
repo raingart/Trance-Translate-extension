@@ -51,8 +51,8 @@ const App = {
                });
                App.translate(false, callback);
             } else {
-            App.makeReturn(parameter);
-            App.confStorage.update();
+               App.makeReturn(parameter);
+               App.confStorage.update();
             }
          });
          App.showLoading(true);
@@ -187,7 +187,7 @@ const App = {
 
    getSelectionText: () => {
       chrome.tabs.getSelected(null, (tab) => {
-         if (App.isLink(tab.url))
+         if (App.isLink(tab.url)) {
             chrome.tabs.executeScript({
                code: "window.getSelection().toString()",
                allFrames: true
@@ -202,6 +202,7 @@ const App = {
                   App.translate();
                }
             });
+         }
       });
    },
 
@@ -233,14 +234,14 @@ const App = {
             UIr.restoreElmValue(res);
 
             App.clearText();
-            
+
             // UI.textOriginal.focus();
             UI.textOriginal.select();
 
             // restore "Auto Detected (lang-code)"" in load
             if (res['lang-from'] && res['lang-from'].charAt(0) == '~') {
                UI.translatedFrom[0].value = res['lang-from'];
-               UI.translatedFrom[0].innerHTML = i18n("translate_from_language") + ' (' + App.translateProvider.langlist[ res['lang-from'].substr(1) ] + ')';
+               UI.translatedFrom[0].innerHTML = i18n("translate_from_language") + ' (' + App.translateProvider.langlist[res['lang-from'].substr(1)] + ')';
             }
          };
          Storage.getParams(null, callback, false /* true=sync, false=local */ );
@@ -252,7 +253,7 @@ const App = {
             let hotkeySend = res.hotkeySend ? res.hotkeySend.replace(/-/, '+') : 'Enter';
             UI.bthTranslate.setAttribute("title", hotkeySend);
          }
-         Storage.getParams(null /*all*/, callback_sync, true  /*true-sync / false-local*/ );
+         Storage.getParams(null /*all*/ , callback_sync, true /*true-sync / false-local*/ );
       },
    },
 
