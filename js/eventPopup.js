@@ -6,22 +6,18 @@ let UI = {};
 window.addEventListener('load', (evt) => {
 
    UI = {
-      translatedFrom: document.getElementById('lang-from'),
-      translatedTo: document.getElementById('lang-to'),
-      textOriginal: document.getElementById('text-original') ||
-         document.querySelectorAll('textarea')[0],
-      textTranslated: document.getElementById('text-translated') ||
-         document.querySelectorAll('textarea')[1],
-      exchangeLang: document.getElementById('bth-lang-exchange'),
+      translatedFrom: document.getElementsByName('lang-from')[0],
+      translatedTo: document.getElementsByName('lang-to')[0],
+      textOriginal: document.getElementsByName('text-original')[0] || document.querySelectorAll('textarea')[0],
+      textTranslated: document.getElementsByName('text-translated')[0] || document.querySelectorAll('textarea')[1],
+      exchangeLang: document.getElementsByName('bth-lang-exchange')[0],
       textToSpeakIn: document.getElementById('btn-text-to-speak-in'),
       textToSpeakOut: document.getElementById('btn-text-to-speak-out'),
-      bthTranslate: document.getElementById('bth-translate'),
-      bthOpenSettings: document.getElementById('bth-open-settings'),
+      bthTranslate: document.getElementsByName('bth-translate')[0],
+      bthOpenSettings: document.getElementsByName('bth-open-settings')[0]
    }
 
-
    App.init();
-
 
    // mouse move event
    //    document.addEventListener('mousemove', function(e) {
@@ -33,7 +29,7 @@ window.addEventListener('load', (evt) => {
 
 
    // Attach the event handlers for nav, hint and insert features
-   //  document.addEventListener('keydown', handleNavKeys, true);
+   // document.addEventListener('keydown', handleNavKeys, true);
    // document.addEventListener('keyup', handleLinkKey, true);
    document.addEventListener('keydown', async (e) => {
       // if (e.altKey && e.which == 13)
@@ -109,8 +105,10 @@ window.addEventListener('load', (evt) => {
    UI.bthOpenSettings.addEventListener("click", function () {
       let iframeId = document.querySelectorAll('iframe')[0];
       iframeId.classList.toggle("hide");
-      if (iframeId.src === '')
-         iframeId.src = '/html/settings.html';
+      if (iframeId.src === '') {
+         const manifest = chrome.runtime.getManifest();
+         iframeId.src = manifest.options_page || options_ui.page;
+      }
 
       iframeId.addEventListener('load', function () {
          App.autoHeightTag(this);

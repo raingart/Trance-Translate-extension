@@ -11,14 +11,14 @@ translateAPI.Google = {
 
    googleHost: 'https://translate.google.com/',
 
-   openNewTab: (url, isActiveTab) => {
+   openNewTab: (url = required(), isActiveTab) => {
       chrome.tabs.create({
          url: url,
          selected: isActiveTab
       })
    },
 
-   toWeb: (args) => {
+   toWeb: (args = required()) => {
       translateAPI.Google.log('translate toWeb:', args.url);
       let url = translateAPI.Google.googleHost + "#" +
          args.from_language + "|" +
@@ -29,7 +29,7 @@ translateAPI.Google = {
       // prompt("toWeb", url); 
    },
 
-   toUrl: (args) => {
+   toUrl: (args = required()) => {
       translateAPI.Google.log('translate toUrl:', args.url);
       let url = translateAPI.Google.googleHost + 'translate?' +
          '&sl=' + 'auto' +
@@ -40,10 +40,10 @@ translateAPI.Google = {
       // prompt("toWeb", url); 
    },
 
-   toSpeak: (request, callback) => {
+   toSpeak: (request = required(), callback) => {
       translateAPI.Google.log('Start Speaking!:\n', JSON.stringify(request));
 
-      if (request && request.textToSpeak) {
+      if (request.textToSpeak) {
          let sourceText = request.textToSpeak.trim();
          let to = request.to_language || 'en';
 
@@ -54,7 +54,7 @@ translateAPI.Google = {
             translateAPI.Google.log(sourceText);
          }
 
-         let soundUrl = translateAPI.Google.googleHost + '/translate_tts?' + 
+         let soundUrl = translateAPI.Google.googleHost + '/translate_tts?' +
             '&client=tw-ob' +
             '&tl=' + to + // translation language
             '&q=' + sourceText; // source-text
@@ -65,12 +65,13 @@ translateAPI.Google = {
          let _callback = ((buffer) => {
             let audioCtx = new(window.AudioContext || window.webkitAudioContext)();
             let source = audioCtx.createBufferSource();
-            
+
             audioCtx.decodeAudioData(buffer, (decodedData) => {
                source.buffer = decodedData;
                source.connect(audioCtx.destination);
                // source.loop = true;
                // source.start(0);
+               // source.close();
             });
             // let audio = document.createElement('audio');
             // audio.onerror = function (event) {
@@ -92,17 +93,17 @@ translateAPI.Google = {
       }
    },
 
-   toText: (request, callback) => {
+   toText: (request = required(), callback) => {
       translateAPI.Google.log('google translate input:\n', JSON.stringify(request));
 
-      if (request && request.original_text) {
+      if (request.original_text) {
          let from = request.from_language || 'auto';
          let to = request.to_language || 'en';
          let sourceText = request.original_text.trim();
 
          let type = request.type || 'json';
 
-         let url = "https://translate.googleapis.com/translate_a/single?" + 
+         let url = "https://translate.googleapis.com/translate_a/single?" +
             '&client=gtx' + // official Google Translate extension
             '&hl=' + i18n("localization") + // UI lang 
             '&dt=t' + // return original text
@@ -113,52 +114,61 @@ translateAPI.Google = {
             '&tl=' + to + // translation language
             '&q=' + encodeURIComponent(sourceText); // ource-text
 
-         let payload = request.payload || {/*
-            'method': 'GET',
-            mode: 'no-cors', 
-            'payload': {
-               'client': 'gtx', // official Google Translate extension
-               'hl': i18n("localization"), // UI lang 
-               'dt': 't', // return original text
-               'dt': 'bd', // add dictionary to word
-               'sl': from, // source language
-               'tl': to, // translation language
-               'q': encodeURIComponent(sourceText), // ource-text
-            }*/
+         let payload = request.payload || {
+            /*
+               'method': 'GET',
+               mode: 'no-cors', 
+               'payload': {
+                  'client': 'gtx', // official Google Translate extension
+                  'hl': i18n("localization"), // UI lang 
+                  'dt': 't', // return original text
+                  'dt': 'bd', // add dictionary to word
+                  'sl': from, // source language
+                  'tl': to, // translation language
+                  'q': encodeURIComponent(sourceText), // ource-text
+               }*/
          };
 
-         let _callback = ((res) => {
+         let _callback = ((res = required()) => {
             let translatedOut = parseResonse(res);
-            
+
             if (callback && typeof (callback) === "function") {
                return callback(translatedOut);
             }
          });
 
          http.fetch(url, payload, type, _callback);
+         // .then(function ({data}) {
+         //    let tArr = data[0]
+         //    for (let i = 0; i < tArr.length; i++) {
+         //      _this.ruleForm.target += tArr[i][0]
+         //    }
+         //  }).catch(function (response) {
+         //    _this.$message.error(window.chrome.i18n.getMessage('apiError'))
+         //  })
       } else {
          console.warn('original_text empty:', request.q);
          return false;
       }
 
-      function parseResonse (res) {
+      function parseResonse(res = required()) {
          translateAPI.Google.log('resirve: ' + JSON.stringify(res));
 
-         if (!res[0]) return false;
-         
+         // if (!res[0]) return false;
+
          return {
             'original_text': res[0][0][1],
 
             // 'transliteration': res[0][1][3],
-   
+
             'translated_text': (() => {
                let out = [];
                // translated
                let sentences = res[0];
                for (let i in sentences)
-                  out.push( sentences[i][0] );
-   
-               out.push( "" );
+                  out.push(sentences[i][0]);
+
+               out.push("");
 
                // transliteration
                // if (res[0][1][3] && res[0][1][3].length)
@@ -168,19 +178,19 @@ translateAPI.Google = {
                if (res[1] && res[1].length) {
                   let dict = res[1];
                   for (let i in dict) {
-                     out.push( dict[i][0] + ":" );
-   
-                     for (let j=0; j<dict[i][1].length; j++)
-                        out.push( (j+1) + ". " + dict[i][1][j] );
-                        
-                     out.push( "" );
+                     out.push(dict[i][0] + ":");
+
+                     for (let j = 0; j < dict[i][1].length; j++)
+                        out.push((j + 1) + ". " + dict[i][1][j]);
+
+                     out.push("");
                   }
                   // collect result
                   return out.join('\n');
                }
-               return out.join( "" );
+               return out.join("");
             })(),
-            
+
             'detectLang': res[2],
          }
       }

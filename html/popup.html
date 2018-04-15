@@ -10,17 +10,17 @@
    <link rel="stylesheet" href="/css/tooltip/tooltip-animation.min.css" />
    <link rel="stylesheet" href="/css/font-awesome.min.css" />
 
-   <link rel="stylesheet" href="/css/global.css" />
+   <link rel="stylesheet" href="/css/globals.css" />
    <link rel="stylesheet" href="/css/popup.css" />
 
-   <script src="/lib/localization.min.js"></script>
-   <script src="/lib/storage.min.js"></script>
+   <script src="/lib/localization.js"></script>
+   <script src="/lib/storage.js"></script>
+   <script src="/lib/retrieve-ui.js"></script>
 
-   <script src="/js/httpFetch.js"></script>
+   <script src="/js/http.js"></script>
    <script src="/js/translate_google.js"></script>
    <script src="/js/eventPopup.js"></script>
    <script src="/js/popup.js"></script>
-   <!-- <script src="/js/e.js"></script> -->
 </head>
 
 <body>
@@ -29,7 +29,7 @@
       <div class="container">
 
          <div class="item">
-            <textarea id="text-original" placeholder="__MSG_translate_in_placeholder__"></textarea>
+            <textarea name="text-original" placeholder="__MSG_translate_in_placeholder__"></textarea>
             <a href="#" id="btn-text-to-speak-in" class="playVoice button" title="Alt+Enter">
                <i class="icon-volume-down"></i>
             </a>
@@ -38,31 +38,31 @@
          <div class="item container">
 
             <div class="item">
-               <select id="lang-from" title="__MSG_translate_from_language_title__">
+               <select name="lang-from" title="__MSG_translate_from_language_title__">
                   <option selected value="">__MSG_translate_from_language__</option>
                </select>
 
-               <button id="bth-lang-exchange" tooltip="__MSG_translate_choice_exchange_title__" flow="down">
+               <button name="bth-lang-exchange" tooltip="__MSG_translate_choice_exchange_title__" flow="down">
                   <i class="icon-exchange"></i>
                   <!--&lt;-&gt; -->
                </button>
 
-               <select id="lang-to" title="__MSG_translate_to_language_title__">
+               <select name="lang-to" title="__MSG_translate_to_language_title__">
                   <option selected value="~">English</option>
                </select>
             </div>
 
             <div class="item">
-               <button id="bth-translate" title="Enter">__MSG_bth_translate__</button>
+               <button name="bth-translate" title="Enter">__MSG_bth_translate__</button>
                
-               <button id="bth-open-settings" tooltip="__MSG_bth_open_settings_title__" flow="left">
+               <button name="bth-open-settings" tooltip="__MSG_bth_open_settings_title__" flow="left">
                   <i class="icon-gear"></i>
                </button>
             </div>
          </div>
 
          <div class="item">
-            <textarea id="text-translated" class="translated-out" readonly></textarea>
+            <textarea name="text-translated" class="translated-out" readonly></textarea>
             <a href="#" id="btn-text-to-speak-out" class="playVoice button" title="__MSG_bth_text_to_speak_title__">
                <i class="icon-volume-down"></i>
             </a>

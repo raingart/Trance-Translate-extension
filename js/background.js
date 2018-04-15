@@ -9,17 +9,17 @@ const Core = {
    },
 
    showNotification: (title, msg, icon) => {
-      let manifest = chrome.runtime.getManifest();
+      const manifest = chrome.runtime.getManifest();
+
       chrome.notifications.create('info', {
-         type: 'basic',
-         iconUrl: icon || manifest.icons['48'], //48,128
+         type: 'basic', //'basic', 'image', 'list', 'progress'
+         iconUrl: typeof (icon) === 'undefined' ? manifest.icons['48'] : '/icons/' + icon,
          title: title || i18n("app_name"),
+         message: msg || '',
          // "priority": 2,
-         message: msg || ''
       }, function (notificationId) {
          chrome.notifications.onClicked.addListener(function (callback) {
-            chrome.notifications.clear(notificationId);
-            // chrome.notifications.clear(notificationId, callback);
+            chrome.notifications.clear(notificationId, callback);
          });
       });
    },
@@ -40,9 +40,7 @@ const Core = {
       });
    },
 
-   translateToNotification: (str) => {
-      if (!str) return false;
-
+   translateToNotification: (str = required()) => {
       let text = str.toString().trim();
 
       let dispatch = {
@@ -57,8 +55,7 @@ const Core = {
       } else {
          let notifyCallback = function (params) {
             Core.showNotification(i18n("app_short_name") +
-               ' [' + /*params.detectLang*/ Core.conf.fromLang + ' > ' + Core.conf.toLang + ']',
-               params.translated_text);
+               ' [' + /*params.detectLang*/ Core.conf.fromLang + ' > ' + Core.conf.toLang + ']', params.translated_text);
          };
          Core.translateProvider.toText(dispatch, notifyCallback);
       }
@@ -92,14 +89,14 @@ const Core = {
             let text = typeof callback === 'string' ? callback : false;
             Core.translateToNotification(text);
             break;
-         case 'translate-hokey':
+         case 'translate-hotkey':
             Core.getSelectionText(Core.translateToNotification);
             break;
          case 'translate-page':
             Core.translatePage();
             break;
-            // default:
-            //   console.log('Sorry, we are out of ' + expr + '.');
+         default:
+            console.warn('Sorry, we are out of ' + command + '.');
       }
    },
 
@@ -130,6 +127,29 @@ const Core = {
       });
    },
 
+   // Register the event handlers.
+   eventListener: () => {
+      chrome.contextMenus.onClicked.addListener(function (clickData, tab) {
+         // console.log('clickData.menuItemId:', clickData.menuItemId);
+         Core.commandRun(clickData.menuItemId, clickData.selectionText);
+      });
+
+      // hotkey
+      chrome.commands.onCommand.addListener(function (onCommand) {
+         console.log('Command:', onCommand);
+
+         Core.commandRun(onCommand);
+      });
+
+      // calls
+      chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+         console.log('request', request);
+         console.log('sender', sender);
+
+         Core.commandRun(request.command || request, sendResponse);
+      });
+   },
+
    loadDefaultSettings: (res) => {
       Core.conf = {};
       Core.conf.fromLang = res['lang-from'] && res['lang-from'].charAt(0) == '~' ? "auto" : res['lang-from'];
@@ -139,37 +159,13 @@ const Core = {
 
    init: () => {
       console.log('Core init');
-      
-      Core.createContextMenu();
 
       let callback = (res) => Core.loadDefaultSettings(res);
-      
       Storage.getParams(null, callback, false);
+
+      Core.createContextMenu();
+      Core.eventListener();
    },
 };
 
 Core.init();
-
-// Register the event handlers.
-chrome.contextMenus.onClicked.addListener(function (clickData, tab) {
-   // console.log('clickData.menuItemId:', clickData.menuItemId);
-   Core.commandRun(clickData.menuItemId, clickData.selectionText);
-});
-
-// hotkey
-chrome.commands.onCommand.addListener(function (onCommand) {
-   console.log('Command:', onCommand);
-
-   Core.commandRun(onCommand);
-});
-
-// calls
-// chrome.runtime.onMessage.addListener(handleMessage);
-// function handleMessage(request, sender, sendResponse) { }
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-   // console.log('core onMessage ',request.command);
-   console.log('request', request);
-   console.log('sender', sender);
-
-   Core.commandRun(request.command || request, sendResponse);
-});

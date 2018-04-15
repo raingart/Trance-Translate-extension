@@ -1,7 +1,7 @@
 console.log(i18n("app_name") + ": init popup.js");
 
 const App = {
-   // debug: true,
+   // DEBUG: true,
 
    translateProvider: {
       langlist: translateAPI['Google'].langlist,
@@ -111,10 +111,12 @@ const App = {
    exchangeLanguages: () => {
       // let translatedFrom_temp = App.getSelectedValue(UI.translatedFrom.value);
       // let translatedTo_temp = App.getSelectedValue(UI.translatedTo.value);
-      let translatedFrom_temp = UI.translatedFrom.value.replace(/~.+$/, '');
-      let translatedTo_temp = UI.translatedTo.value;
-      App.setSelectOption(UI.translatedFrom, translatedTo_temp);
-      App.setSelectOption(UI.translatedTo, translatedFrom_temp);
+      // temp
+      let temp_translatedFrom = UI.translatedFrom.value.replace(/~.+$/, '');
+      let temp_translatedTo = UI.translatedTo.value;
+      // aplay
+      App.setSelectOption(UI.translatedFrom, temp_translatedTo);
+      App.setSelectOption(UI.translatedTo, temp_translatedFrom);
 
       App.exchangeText();
    },
@@ -124,7 +126,8 @@ const App = {
       let a = UI.textOriginal;
       let b = UI.textTranslated;
       if (a.value == '') {
-         b.value = [a.value, a.value = b.value][0];
+         // b.value = [a.value, a.value = b.value][0];
+         [a.value, b.value] = [b.value, a.value];
       }
    },
 
@@ -159,23 +162,24 @@ const App = {
 
       App.translateProvider.toSpeak(args, (audio) => {
          audio.start();
+         // audio.play();
 
          ico.classList.replace("icon-volume-down", "icon-volume-up");
 
          // general
          audio.addEventListener('ended', function () {
             App.log('playing end');
-            enable_el();
+            defaultIcon();
          });
 
          // spare
-         setTimeout(function () {
-            enable_el();
-         }, 3000);
+         // setTimeout(function () {
+         //    defaultIcon();
+         // }, 3000);
 
-         function enable_el() {
+         function defaultIcon() {
             ico.classList.replace("icon-volume-up", "icon-volume-down");
-            App.log('enable_el ' + el.classList.contains("icon-volume-down"));
+            App.log('defaultIcon ' + el.classList.contains("icon-volume-down"));
             // el.classList.remove("disabled");
          }
       });
@@ -225,8 +229,8 @@ const App = {
 
       load: () => {
          // local get textarea and lang-to/from
-         let callback = ((res) => {
-            Storage.retrieveOptions(res);
+         let callback = (res) => {
+            UIr.restoreElmValue(res);
 
             App.clearText();
             
@@ -238,8 +242,8 @@ const App = {
                UI.translatedFrom[0].value = res['lang-from'];
                UI.translatedFrom[0].innerHTML = i18n("translate_from_language") + ' (' + App.translateProvider.langlist[ res['lang-from'].substr(1) ] + ')';
             }
-         });
-         Storage.getParams(null /*all*/ , callback, false /*local*/ );
+         };
+         Storage.getParams(null, callback, false /* true=sync, false=local */ );
 
          // sync get option param
          let callback_sync = (res) => {
@@ -248,7 +252,7 @@ const App = {
             let hotkeySend = res.hotkeySend ? res.hotkeySend.replace(/-/, '+') : 'Enter';
             UI.bthTranslate.setAttribute("title", hotkeySend);
          }
-         Storage.getParams(null /*all*/, callback_sync, true  /*true-sync / false-local*/  );
+         Storage.getParams(null /*all*/, callback_sync, true  /*true-sync / false-local*/ );
       },
    },
 
@@ -264,12 +268,12 @@ const App = {
       App.bildOptionTag(UI.translatedTo, App.translateProvider.langlist);
    },
 
-   log: (msg, arg1) => {
-      if (App.debug) console.log('[+] ' + msg.toString(), arg1 || '')
+   log: (msg, args) => {
+      let arg = args === undefined ? '' : args;
+      App.DEBUG && console.log('[+] ' + msg.toString().trim(), arg)
    },
 
    // langlist: lang.map(code => code.substr(0, 2).toLowerCase()),
-   // return x<y ? -1 : x>y ? 1 : 0;
    // langlist: lang.forEach(function(value, key) {
    //    // console.log(key + ' = ' + value);
    //  }),

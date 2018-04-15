@@ -9,7 +9,7 @@
    },
    "app_short_name": {
       "description": "Extension's short name",
-      "message": "Trance"
+      "message": "Trance Translate"
    },
    "app_description": {
       "description": "Extension's description",
@@ -35,7 +35,7 @@
    },
    "translate_choice_exchange_title": {
       "description": "Exchange title",
-      "message": "Exchange places language (Shift+Ctrl)"
+      "message": "Exchange places language (Ctrl+Shift)"
    },
    "translate_to_language_title": {
       "description": "Target language title",
@@ -44,11 +44,11 @@
 
    "context_menu_selection": {
       "description": "Translate context menu item selection",
-      "message": "Trance Translate \"%s\""
+      "message": "Translate it"
    },
    "context_menu_page": {
       "description": "Translate context menu item page",
-      "message": "Trance Translate this Page"
+      "message": "Translate this Page"
    },
 
    "bth_translate": {
