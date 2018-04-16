@@ -55,7 +55,7 @@ const Core = {
       } else {
          let notifyCallback = function (params) {
             Core.showNotification(i18n("app_short_name") +
-               ' [' + /*params.detectLang*/ Core.conf.fromLang + ' > ' + Core.conf.toLang + ']', params.translated_text);
+               ' [' + params.detectLang /*dispatch.from_language*/ + ' > ' + dispatch.to_language + ']', params.translated_text);
          };
          Core.translateProvider.toText(dispatch, notifyCallback);
       }
