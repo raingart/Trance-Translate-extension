@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+   <meta charset="utf-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>__MSG_app_name__ settings</title>
+   <link rel="stylesheet" href="/css/normalize.min.css">
+   <link rel="stylesheet" href="/css/tooltip/tooltip.min.css" />
+   <link rel="stylesheet" href="/css/tooltip/tooltip-animation.min.css" />
+
+   <link rel="stylesheet" href="/css/globals.css" />
+   <link rel="stylesheet" href="/css/options.css" />
+
+   <script src="/lib/localization.js"></script>
+   <script src="/lib/storage.js"></script>
+   <script src="/lib/retrieve-ui.js"></script>
+   <script src="/lib/options.js"></script>
+</head>
+
+<body>
+   <div class="wrapper">
+      <form enctype="multipart/form-data" class="container">
+
+         <div class="item">
+            <div class="info">
+               <label for="hotkeySend">__MSG_opt_hotkey_send__
+                  <span>__MSG_opt_hotkey_send_desc__</span>
+               </label>
+            </div>
+            <div class="opt" tooltip="__MSG_opt_hotkey_send_tooltip__" flow="left">
+               <select name="hotkeySend" id="hotkeySend">
+                  <option value="enter" selected>Enter</option>
+                  <option value="ctrl-enter">Ctrl+Enter</option>
+               </select>
+            </div>
+         </div>
+
+         <!-- <hr /> -->
+
+         <div class="between">
+            <button type="submit" tooltip="__MSG_opt_bth_save_settings_tooltip__" flow="right">__MSG_opt_bth_save_settings__</button>
+            
+            <a href="https://www.patreon.com/bePatron?c=884203" target="_blank" tooltip="__MSG_donate_tooltip__" flow="left">__MSG_donate__</a>
+         </div>
+
+      </form>
+   </div>
+
+</body>
+
+</html>
