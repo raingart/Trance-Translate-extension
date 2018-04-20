@@ -100,7 +100,7 @@
    },
    "opt_bth_save_settings_tooltip": {
       "description": "option save button settings title",
-      "message": "the extension will restart"
+      "message": "Applied instantly"
    },
 
    "donate_tooltip": {

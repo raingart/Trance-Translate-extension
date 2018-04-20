@@ -4,7 +4,7 @@ const Core = {
 
    translateProvider: {
       toText: translateAPI['Google'].toText,
-      toUrl: translateAPI['Google'].openNewTab,
+      toUrl: translateAPI['Google'].toUrl,
       toWeb: translateAPI['Google'].toWeb
    },
 
