@@ -87,7 +87,7 @@ window.addEventListener('load', (evt) => {
    UI.textToSpeakOut.addEventListener("click", function () {
       App.speakPlay(this, {
          textToSpeak: UI.textTranslated.value.split(/(\n\w+:\n1.)/)[0],
-         to_language: UI.translatedTo.value,
+         to_language: UI.translatedTo.value.replace(/~/, ''), //clear prefix temp lang 
       });
    });
 
