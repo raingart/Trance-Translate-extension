@@ -8,14 +8,16 @@ FILENAME='Tractor'
 rm -v $FILENAME.zip
 zip -r $FILENAME.zip \
                   _locales \
+                  css/libs/*/*.css \
+                  css/*/*.css \
+                  css/*.css \
+                  html/*.html \
                   icons/16.png \
                   icons/48.png \
                   icons/128.png \
                   js/*.js \
-                  lib/*.js \
-                  html/*.html \
-                  css/*/*.css \
-                  css/*.css \
+                  js/libs/*.js \
+                  svg/* \
                   manifest.json \
                   LICENSE \
 #  -z $TODAY

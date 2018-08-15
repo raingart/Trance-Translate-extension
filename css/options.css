@@ -7,30 +7,40 @@ body {
    margin: 0 15px 10px;
 }
 
-.container>div {
-   position: relative;
+form>ul {
+   list-style: none;
+   padding: 0;
+   margin: 0;
+}
+
+form>ul>li,
+div.between {
    padding: 8px 0;
 }
 
-.container>div.item {
-   position: relative;
+div.between {
+   justify-content: space-between;
+   display: flex;
+   flex-direction: row;
+}
+
+div.between>a {
+   align-self: center;
+}
+
+div.between:first-child {
+   padding-top: 0;
+}
+
+form>ul>li.item {
    display: grid;
    grid-template-columns: [left info] 1fr [right opt];
    
-   padding: 8px 0;
+   /* padding: 8px 0; */
 }
 
-/* .container>div.item:not(:last-child) {
-   border-bottom: 1px solid #e0e0e0;
-} */
-
-.container>div.item:not(:last-child) {
+form>ul>li.item:not(:last-child) {
    border-top: 1px solid #e0e0e0;
-   border-bottom: 1px solid #e0e0e0;
-}
-
-.container>div.item:last-child {
-   margin: 0 5px;
 }
 
 .info {
@@ -67,14 +77,4 @@ hr {
 h2 {
    font-weight: normal;
    margin: 0;
-}
-
-div.between {
-   justify-content: space-between;
-   display: flex;
-   flex-direction: row;
-}
-
-div.between>a {
-   align-self: center;
 }

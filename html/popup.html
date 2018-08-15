@@ -5,20 +5,20 @@
    <meta charset="utf-8" />
    <meta name="viewport" content="width=device-width, initial-scale=1">
    <title>__MSG_app_name__</title>
-   <link rel="stylesheet" href="/css/normalize.min.css">
-   <link rel="stylesheet" href="/css/tooltip/tooltip.min.css" />
-   <link rel="stylesheet" href="/css/tooltip/tooltip-animation.min.css" />
-   <link rel="stylesheet" href="/css/font-awesome.min.css" />
+   <link rel="stylesheet" href="/css/libs/normalize.min.css">
+   <link rel="stylesheet" href="/css/libs/tooltip/tooltip.min.css" />
+   <link rel="stylesheet" href="/css/libs/tooltip/tooltip-animation.min.css" />
 
    <link rel="stylesheet" href="/css/globals.css" />
    <link rel="stylesheet" href="/css/popup.css" />
 
-   <script src="/lib/localization.js"></script>
-   <script src="/lib/storage.js"></script>
-   <script src="/lib/retrieve-ui.js"></script>
+   <script src="/js/libs/localization.js"></script>
+   <script src="/js/libs/storage.js"></script>
+   <script src="/js/libs/retrieve-ui.js"></script>
 
-   <script src="/js/http.js"></script>
-   <script src="/js/translate_google.js"></script>
+   <script src="/js/libs/http.js"></script>
+   <script src="/js/libs/translate_google.js"></script>
+
    <script src="/js/eventPopup.js"></script>
    <script src="/js/popup.js"></script>
 </head>
@@ -31,7 +31,7 @@
          <div class="item">
             <textarea name="text-original" placeholder="__MSG_translate_in_placeholder__"></textarea>
             <a href="#" id="btn-text-to-speak-in" class="playVoice button" title="Alt+Enter">
-               <i class="icon-volume-down"></i>
+               <i class="fa-volume-down"></i>
             </a>
          </div>
 
@@ -43,8 +43,8 @@
                </select>
 
                <button name="bth-lang-exchange" tooltip="__MSG_translate_choice_exchange_title__" flow="down">
-                  <i class="icon-exchange"></i>
-                  <!--&lt;-&gt; -->
+                  <!-- <i class="fa-exchange"></i> -->
+                  <img class="icon" src="/svg/exchange.svg" alt="exchange">
                </button>
 
                <select name="lang-to" title="__MSG_translate_to_language_title__">
@@ -56,15 +56,16 @@
                <button name="bth-translate" title="Enter">__MSG_bth_translate__</button>
                
                <button name="bth-open-settings" tooltip="__MSG_bth_open_settings_title__" flow="left">
-                  <i class="icon-gear"></i>
+                  <!-- <i class="fa-gear"></i> -->
+                  <img class="icon" src="/svg/gear.svg" alt="gear">
                </button>
             </div>
          </div>
 
          <div class="item">
-            <textarea name="text-translated" class="translated-out" readonly></textarea>
+            <textarea name="text-translated" class="translated-out" title="mouse middle click - copy text" readonly></textarea>
             <a href="#" id="btn-text-to-speak-out" class="playVoice button" title="__MSG_bth_text_to_speak_title__">
-               <i class="icon-volume-down"></i>
+               <i class="fa-volume-down"></i>
             </a>
          </div>
 

@@ -76,6 +76,15 @@ window.addEventListener('load', (evt) => {
       App.autoHeightTag(this);
    });
 
+   UI.textTranslated.addEventListener("mousedown", function (e) {
+      if( e.which == 2 ) {
+         this.select();
+         // this.split();
+         document.execCommand('copy');
+         e.preventDefault();
+      }
+   });
+
    // UI.textToSpeakIn.onclick = async(event) => {
    UI.textToSpeakIn.addEventListener("click", function () {
       App.speakPlay(this, {

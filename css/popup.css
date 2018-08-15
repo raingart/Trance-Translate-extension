@@ -13,17 +13,17 @@ body {
    grid-template-columns: 1fr auto;
    /* grid-gap: 10px;
    grid-auto-rows: 100px; */
-   grid-template-areas: "a b";
+   grid-template-areas: "left right";
    /* align-items: start; */
    padding: 8px 0;
 }
 
 .container>.container>.item:nth-child(1) {
-   grid-area: a;
+   grid-area: left;
 }
 
 .container>.container>.item:nth-child(2) {
-   grid-area: b;
+   grid-area: right;
 }
 
 textarea {
@@ -68,3 +68,16 @@ textarea.translated-out {
 .playVoice>* {
    font-size: 1.4em !important;
 }
+
+button {
+   max-height: 25px;
+}
+
+.icon {
+   /* display: inline-block; */
+   width: 1em;
+   height: 1em;
+   stroke-width: 0;
+   stroke: currentColor;
+   fill: currentColor;
+ }

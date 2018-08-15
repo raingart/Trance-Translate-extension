@@ -1,10 +1,13 @@
 body {
-   /* font-size: 1.5em; */
    font-size: 13px;
    font-family: Raleway, HelveticaNeue, "Helvetica Neue", Helvetica, Arial, sans-serif;
    color: #111;
    margin: 0 auto;
    line-height: 1.3;
+   overflow: hidden;
+   position: relative; 
+   width: 100%;
+   /* height: 100vh; */
 }
 
 a {
@@ -13,14 +16,7 @@ a {
    /* text-decoration: none; */
 }
 
-/* .container {
-   display: flex;
-   flex-direction: column;
-   flex-wrap: wrap;
-   position: relative;
-} */
-
-div.item {
+div {
    position: relative;
 }
 
@@ -34,6 +30,22 @@ textarea {
    border: 1px solid #cccccc;
    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+
+input:valid,
+intextareaput:valid,
+select:valid {
+   outline: none;
+}
+
+input:invalid,
+textarea:invalid,
+select:invalid {
+   outline: 1px solid red;
+}
+
+input[type=color] {
+   padding: 3px;
 }
 
 select {
@@ -89,7 +101,7 @@ textarea:not([disabled]):not([readonly]):focus {
 
 .disabled,
 [disabled] {
-   /* opacity: .5; */
+   opacity: .7;
    cursor: default !important;
    pointer-events: none;
 }
