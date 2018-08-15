@@ -8,16 +8,16 @@ const Core = {
       toWeb: translateAPI['Google'].toWeb
    },
 
-   showNotification: (title, msg, icon) => {
+   showNotification: (opt) => {
       const manifest = chrome.runtime.getManifest();
-
-      chrome.notifications.create('info', {
-         type: 'basic', //'basic', 'image', 'list', 'progress'
-         iconUrl: typeof (icon) === 'undefined' ? manifest.icons['48'] : '/icons/' + icon,
-         title: title || i18n("app_name"),
-         message: msg || '',
+      let options = {
+         type: opt.type || 'basic', //'basic', 'image', 'list', 'progress'
+         title: opt.title || i18n("app_name"),
+         iconUrl: opt.iconUrl || manifest.icons['48'],
+         message: opt.message || '',
          // "priority": 2,
-      }, function (notificationId) {
+      };
+      chrome.notifications.create('info', options, function (notificationId) {
          chrome.notifications.onClicked.addListener(function (callback) {
             chrome.notifications.clear(notificationId, callback);
          });
@@ -54,8 +54,10 @@ const Core = {
 
       } else {
          let notifyCallback = function (params) {
-            Core.showNotification(i18n("app_short_name") +
-               ' [' + params.detectLang /*dispatch.from_language*/ + ' > ' + dispatch.to_language + ']', params.translated_text);
+            Core.showNotification ({
+               title: i18n("app_short_name") + ' [' + params.detectLang /*dispatch.from_language*/ + ' > ' + dispatch.to_language + ']',
+               message: params.translated_text
+            });
          };
          Core.translateProvider.toText(dispatch, notifyCallback);
       }
