@@ -5,26 +5,24 @@ window.addEventListener('load', (evt) => {
    const Conf = {
 
       attrDependencies: () => {
-         let highlightedItems = document.querySelectorAll("[data-dependent]");
+         Array.from(document.querySelectorAll("[data-dependent]"))
+            .map((dependentItem) => {
+               // let dependentsList = dependentItem.getAttribute('data-dependent').split(',').map(i => i.trim());
+               let dependentsJson = JSON.parse(dependentItem.getAttribute('data-dependent').toString());
 
-         highlightedItems.forEach(function (dependentItem) {
-            // let dependentsList = dependentItem.getAttribute('data-dependent').split(',').map(i => i.trim());
-            let dependentsJson = JSON.parse(dependentItem.getAttribute('data-dependent').toString());
-
-            // init state
-            showOrHide(dependentItem, dependentsJson);
-
-            let itemTagName = Object.keys(dependentsJson);
-            let dependentTag = document.getElementsByName(itemTagName)[0] || document.getElementById(itemTagName);
-
-            dependentTag.addEventListener("change", function () {
+               // init state
                showOrHide(dependentItem, dependentsJson);
-            });
-         })
 
+               let itemTagName = Object.keys(dependentsJson);
+               let dependentTag = document.getElementsByName(itemTagName)[0] || document.getElementById(itemTagName);
+
+               dependentTag.addEventListener("change", function () {
+                  showOrHide(dependentItem, dependentsJson);
+               });
+            });
          function showOrHide(dependentItem, dependentsList) {
-            for (let name in dependentsList)
-               for (let thisVal of dependentsList[name]) {
+            for (const name in dependentsList)
+               for (const thisVal of dependentsList[name]) {
                   let reqParent = document.getElementsByName(name)[0];
 
                   if (reqParent.checked && thisVal) {
@@ -66,7 +64,7 @@ window.addEventListener('load', (evt) => {
          Storage.setParams(newOptions, true /* true=sync, false=local */ );
 
          chrome.extension.sendMessage({
-            "name": 'setOptions',
+            "message": 'setOptions',
             "options": newOptions
          }, function (resp) {
             if (callback && typeof (callback) === "function") {

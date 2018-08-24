@@ -86,7 +86,7 @@ translateAPI.Google = {
             }
          });
 
-         http.fetch(soundUrl, payload, type, _callback);
+         HTTP_request.fetch(soundUrl, payload, type, _callback);
       } else {
          console.warn('sourceText empty:', request.sourceText);
          return false;
@@ -137,7 +137,7 @@ translateAPI.Google = {
             }
          });
 
-         http.fetch(url, payload, type, _callback);
+         HTTP_request.fetch(url, payload, type, _callback);
          // .then(function ({data}) {
          //    let tArr = data[0]
          //    for (let i = 0; i < tArr.length; i++) {
