@@ -64,7 +64,7 @@ window.addEventListener('load', (evt) => {
          Storage.setParams(newOptions, true /* true=sync, false=local */ );
 
          chrome.extension.sendMessage({
-            "message": 'setOptions',
+            "command": 'setOptions',
             "options": newOptions
          }, function (resp) {
             if (callback && typeof (callback) === "function") {

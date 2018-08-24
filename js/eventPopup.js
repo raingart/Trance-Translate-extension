@@ -44,7 +44,7 @@ window.addEventListener('load', (evt) => {
 
    // Register the event handlers.
    UI.textOriginal.addEventListener("keydown", async (e) => {
-      App.log('e:', e);
+      App.log('e: %s', e);
 
       let currentKeys = [];
       let storeKeys = App.tempSync.hotkeySend ? App.tempSync.hotkeySend.toLowerCase() : 'enter';
@@ -61,12 +61,12 @@ window.addEventListener('load', (evt) => {
          currentKeys.push('enter');
 
       currentKeys = currentKeys.join("-").toString().toLowerCase();
-      App.log('currentKeys ' + currentKeys);
-      console.log('currentKeys ' + currentKeys);
+      App.log('currentKeys %s', currentKeys);
+      console.log('currentKeys %s', currentKeys);
 
       // key is press
       if (currentKeys == storeKeys) {
-         console.log('hit: ' + storeKeys + '(setting)==' + currentKeys + '(now)');
+         console.log('hit: %s (setting)==%s(now)', storeKeys, currentKeys);
          App.translate()
          e.preventDefault(); //prevent default behavior
       }

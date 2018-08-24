@@ -85,8 +85,8 @@ const Core = {
       });
    },
 
-   commandRun: (command, callback) => {
-      switch (command) {
+   commandRun: (commands, callback) => {
+      switch (commands.command || commands) {
          case 'translate-context':
             let text = typeof callback === 'string' ? callback : false;
             Core.translateToNotification(text);
@@ -97,8 +97,11 @@ const Core = {
          case 'translate-page':
             Core.translatePage();
             break;
+         case 'setOptions':
+            Core.loadDefaultSettings(commands.options);
+            break;
          default:
-            console.warn('Sorry, we are out of ' + command + '.');
+            console.warn('Sorry, we are out of %s.', commands.command);
       }
    },
 
@@ -138,17 +141,17 @@ const Core = {
 
       // hotkey
       chrome.commands.onCommand.addListener(function (onCommand) {
-         console.log('Command:', onCommand);
+         console.log('onCommand: %s', onCommand);
 
          Core.commandRun(onCommand);
       });
 
       // calls
       chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-         console.log('request', request);
-         console.log('sender', sender);
+         console.log('onMessage request: %s', JSON.stringify(request));
+         console.log('onMessage sender: %s', JSON.stringify(sender));
 
-         Core.commandRun(request.command || request, sendResponse);
+         Core.commandRun(request, sendResponse);
       });
    },
 
@@ -156,7 +159,7 @@ const Core = {
       Core.conf = {};
       Core.conf.fromLang = res['lang-from'] && res['lang-from'].charAt(0) == '~' ? "auto" : res['lang-from'];
       Core.conf.toLang = res['lang-to'] || "en";
-      console.log('loadDefaultSettings', JSON.stringify(Core.conf));
+      console.log('loadDefaultSettings: %s', JSON.stringify(Core.conf));
    },
 
    init: () => {

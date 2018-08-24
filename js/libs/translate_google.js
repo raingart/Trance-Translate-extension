@@ -3,7 +3,8 @@ console.log(i18n("app_name") + ": init google_ts.js");
 const translateAPI = {};
 
 translateAPI.Google = {
-   // debug: true,
+
+   // DEBUG: true,
 
    langlist: {
       /* beautify preserve:start */af:"Afrikaans",sq:"Albanian",am:"Amharic",ar:"العربية",hy:"Armenian",az:"Azeerbaijani",eu:"Basque",be:"Belarusian",bn:"Bengali",bs:"Bosnian",bg:"Bulgarian",ca:"Catalan",ceb:"Cebuano","zh-CN":"Chinese","zh-TW":"中國傳統",co:"Corsican",hr:"Croatian",cs:"Czech",da:"Danish",nl:"Dutch",en:"English",eo:"Esperanto",et:"Estonian",fi:"Finnish",fr:"French",fy:"Frisian",gl:"Galician",ka:"Georgian",de:"German",el:"Greek",gu:"Gujarati",ht:"Haitian Creole",ha:"Hausa",haw:"Hawaiian",iw:"Hebrew",hi:"Hindi",hmn:"Hmong",hu:"Hungarian",is:"Icelandic",ig:"Igbo",id:"Indonesian",ga:"Irish",it:"Italian",ja:"Japanese",jw:"Javanese",kn:"Kannada",kk:"Kazakh",km:"Khmer",ko:"Korean",ku:"Kurdish",ky:"Kyrgyz",lo:"Lao",la:"Latin",lv:"Latvian",lt:"Lithuanian",lb:"Luxembourgish",mk:"Macedonian",mg:"Malagasy",ms:"Malay",ml:"Malayalam",mt:"Maltese",mi:"Maori",mr:"Marathi",mn:"Mongolian",my:"Myanmar",ne:"Nepali",no:"Norwegian",ny:"Nyanja",ps:"Pashto",fa:"Persian",pl:"Polish",pt:"Portuguese",pa:"Punjabi",ro:"Romanian",ru:"Russian",sm:"Samoan",gd:"Scots Gaelic",sr:"Serbian",st:"Sesotho",sn:"Shona",sd:"Sindhi",si:"Sinhala",sk:"Slovak",sl:"Slovenian",so:"Somali",es:"Spanish",su:"Sundanese",sw:"Swahili",sv:"Swedish",tl:"Tagalog",tg:"Tajik",ta:"Tamil",te:"Telugu",th:"Thai",tr:"Turkish",uk:"Ukrainian",ur:"Urdu",uz:"Uzbek",vi:"Vietnamese",cy:"Welsh",xh:"Xhosa",yi:"Yiddish",yo:"Yoruba",zu:"Zulu"/* beautify preserve:end */
@@ -19,7 +20,7 @@ translateAPI.Google = {
    },
 
    toWeb: (args = required()) => {
-      translateAPI.Google.log('translate toWeb:', args.url);
+      translateAPI.Google.log('translate toWeb: %s', args.url);
       let url = translateAPI.Google.googleHost + "#" +
          args.from_language + "|" +
          args.to_language + "|" +
@@ -30,7 +31,7 @@ translateAPI.Google = {
    },
 
    toUrl: (args = required()) => {
-      translateAPI.Google.log('translate toUrl:', args.url);
+      translateAPI.Google.log('translate toUrl: %s', args.url);
       let url = translateAPI.Google.googleHost + 'translate?' +
          '&sl=' + 'auto' +
          "&tl=" + args.to_language +
@@ -41,7 +42,7 @@ translateAPI.Google = {
    },
 
    toSpeak: (request = required(), callback) => {
-      translateAPI.Google.log('Start Speaking!:\n', JSON.stringify(request));
+      translateAPI.Google.log('Start Speaking!:\n%s', JSON.stringify(request));
 
       if (request.textToSpeak) {
          let sourceText = request.textToSpeak.trim();
@@ -94,7 +95,7 @@ translateAPI.Google = {
    },
 
    toText: (request = required(), callback) => {
-      translateAPI.Google.log('google translate input:\n', JSON.stringify(request));
+      translateAPI.Google.log('google translate input:\n%s', JSON.stringify(request));
 
       if (request.original_text) {
          let from = request.from_language || 'auto';
@@ -152,7 +153,7 @@ translateAPI.Google = {
       }
 
       function parseResonse(res = required()) {
-         translateAPI.Google.log('resirve: ' + JSON.stringify(res));
+         translateAPI.Google.log('resirve: %s', JSON.stringify(res));
 
          // if (!res[0]) return false;
 
@@ -196,7 +197,10 @@ translateAPI.Google = {
       }
    },
 
-   log: (msg, arg1) => {
-      if (translateAPI.Google.debug) console.log('>> ' + msg.toString(), arg1 || '')
-   }
+   log: (msg, arg) => {
+      if (translateAPI.Google.DEBUG) {
+         if (arg) msg = msg.replace(/%s/g, arg.toString().trim());
+         console.log('>> ' + msg);
+      }
+   },
 };

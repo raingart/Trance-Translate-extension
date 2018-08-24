@@ -87,11 +87,16 @@ button {
    max-height: 25px;
 }
 
-.icon {
-   /* display: inline-block; */
+img[class|="icon"] {
    width: 1em;
    height: 1em;
    stroke-width: 0;
    stroke: currentColor;
    fill: currentColor;
- }
+}
+
+button>img[class|="icon"] {
+   width: 1.1em;
+   height: 1.1em;
+   opacity: 0.8;
+}

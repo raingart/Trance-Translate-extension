@@ -30,20 +30,20 @@ const App = {
 
       if (dispatch_.original_text) { //skip if empty text
          let callback_ = callback || ((parameter) => {
-            App.log('resirve:', JSON.stringify(parameter));
+            App.log('resirve: %s', JSON.stringify(parameter));
             // console.log('resirve:', JSON.stringify(parameter));
             App.showLoading(false);
 
             // if translated To == From invert lang
             // set new callback
-            console.log('parameter.detectLang: ' + parameter.detectLang);
-            console.log('dispatch_.to_language: ' + dispatch_.to_language);
+            console.log('parameter.detectLang: %s', parameter.detectLang);
+            console.log('dispatch_.to_language: %s', dispatch_.to_language);
             if (parameter.detectLang == dispatch_.to_language &&
                dispatch_.from_language != dispatch_.to_language) {
                // App.setSelectOption(UI.translatedTo, UI.translatedFrom.value);
                App.exchangeLanguages();
                let callback = ((parameter) => {
-                  App.log('resirve:', JSON.stringify(parameter));
+                  App.log('resirve: %s', JSON.stringify(parameter));
                   App.showLoading(false);
                   App.makeReturn(parameter);
                   App.confStorage.update();
@@ -179,7 +179,7 @@ const App = {
 
          function defaultIcon() {
             ico.classList.replace("icon-volume-up", "icon-volume-down");
-            App.log('defaultIcon ' + el.classList.contains("icon-volume-down"));
+            App.log('defaultIcon %s', el.classList.contains("icon-volume-down"));
             // el.classList.remove("disabled");
          }
       });
@@ -219,13 +219,25 @@ const App = {
             console.log('[chrome.storage] clear!');
          }
 
-         let optionsSave = {};
-         optionsSave['lang-from'] = UI.translatedFrom.value;
-         optionsSave['lang-to'] = UI.translatedTo.value;
-         optionsSave['text-original'] = UI.textOriginal.value.trim();
-         optionsSave['text-translated'] = UI.textTranslated.value;
+         let newOptions = {};
+         newOptions['lang-from'] = UI.translatedFrom.value;
+         newOptions['lang-to'] = UI.translatedTo.value;
 
-         Storage.setParams(optionsSave, false /*local*/ );
+         chrome.extension.sendMessage({
+            "command": 'setOptions',
+            "options": newOptions
+         // }, newOptions
+         }, function (resp) {
+            // if (callback && typeof (callback) === "function") {
+            //    return callback();
+            // }
+         });
+         // );
+         
+         newOptions['text-original'] = UI.textOriginal.value.trim();
+         newOptions['text-translated'] = UI.textTranslated.value;
+
+         Storage.setParams(newOptions, false /*local*/ );
       },
 
       load: () => {
@@ -269,9 +281,11 @@ const App = {
       App.bildOptionTag(UI.translatedTo, App.translateProvider.langlist);
    },
 
-   log: (msg, args) => {
-      let arg = args === undefined ? '' : args;
-      App.DEBUG && console.log('[+] ' + msg.toString().trim(), arg)
+   log: (msg, arg) => {
+      if (App.DEBUG) {
+         if (arg) msg = msg.replace(/%s/g, arg.toString().trim());
+         console.log('[+] ' + msg);
+      }
    },
 
    // langlist: lang.map(code => code.substr(0, 2).toLowerCase()),
